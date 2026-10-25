@@ -1,0 +1,36 @@
+{
+  "title": "Get Node from Pod Logs",
+  "type": "action",
+  "description": "Query k8s_pod logs to find the GKE node name where the pod was scheduled.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-12",
+  "updated": "2026-06-12",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'resource.type=\"k8s_pod\" AND resource.labels.pod_name=\"${pod_name}\"' --project ${project_id} --limit 5 --format=\"value(resource.labels.node_name)\" --freshness=${freshness}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "pod_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}

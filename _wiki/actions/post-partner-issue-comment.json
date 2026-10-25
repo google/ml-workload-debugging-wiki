@@ -1,0 +1,37 @@
+{
+  "title": "Post Partner Issue Comment",
+  "type": "action",
+  "description": "Stages the diagnostic handoff comment for the Partner Issue Tracker: renders the comment body and prints the issue link (or the new-issue link) for the operator to paste it. Does not post automatically. Requires explicit operator approval, which also clears the content for sharing with the partner.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "approval"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/render_issue_body.py --findings=${findings} --output_file=${output_file} --bucket=${bucket}",
+  "summary_fields": [
+    "status",
+    "output_file",
+    "issue_url"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Location of formatted comment body markdown"
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name"
+    }
+  }
+}

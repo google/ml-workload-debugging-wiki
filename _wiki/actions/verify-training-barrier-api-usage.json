@@ -1,0 +1,28 @@
+{
+  "title": "Verify Training Barrier API Usage",
+  "type": "action",
+  "description": "Inspect training files to verify that collective barrier synchronization at the end of checkpoint/IO loading uses wait_at_barrier rather than MXLA all-reduce collectives.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-06-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "grep -rn \"wait_at_barrier\" ${training_code_dir}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "training_code_dir": {
+      "type": "string",
+      "description": "Path to the training codebase directory to inspect"
+    }
+  }
+}

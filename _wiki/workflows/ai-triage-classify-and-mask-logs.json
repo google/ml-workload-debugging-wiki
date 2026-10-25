@@ -1,0 +1,26 @@
+{
+  "title": "AI Triage, Classify and Mask Logs",
+  "type": "workflow",
+  "description": "Composed workflow that pulls workload logs via ingestion pipeline, processes/classifies/unmasks them via processing pipeline, and matches symptoms.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-21",
+  "updated": "2026-07-27",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[log-ingestion-pipeline]]",
+    "[[log-processing-pipeline]]",
+    "[[ai-match-symptoms]]"
+  ]
+}

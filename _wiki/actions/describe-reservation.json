@@ -1,0 +1,33 @@
+{
+  "title": "Describe Reservation",
+  "type": "action",
+  "description": "Describe compute reservation details.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud compute reservations describe ${reservation_name} --project=${project_id} --zone=${zone}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "reservation_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    }
+  }
+}

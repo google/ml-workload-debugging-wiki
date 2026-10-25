@@ -1,0 +1,124 @@
+{
+  "title": "Lookup Workload Timestamps",
+  "type": "action",
+  "description": "Lookup first_occurrence and last_occurrence timestamps for a given workload using Cloud Logging. Automatically infers a narrow search window when the workload name contains a MMDD or YYYYMMDD date token (e.g., my-tpu-job-0827); for other runs older than 30 days, pass explicit --start/--end timestamps.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-20",
+  "updated": "2026-10-22",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/lookup_workload_timestamps.py --jobset_name=${jobset_name} --project_id=${project_id} --project_number=${project_number} --namespace=${namespace} --restart_attempt=${restart_attempt} --latest_attempts=${latest_attempts} --window_minutes=${window_minutes} --start=\"${start}\" --end=\"${end}\" --bucket=${bucket} --location=${location} --view=${view} --output_file=${output_file} --lookback_days=${lookback_days}",
+  "summary_fields": [
+    "first_occurrence",
+    "last_occurrence",
+    "attempts",
+    "selector_mode",
+    "used_fast_path",
+    "output_file"
+  ],
+  "questionnaire": {
+    "title": "Analysis Lookback Window",
+    "description": "Specify how many days back to analyze workload logs and telemetry (defaults to 1 day).",
+    "fields": [
+      {
+        "name": "lookback_days",
+        "question": "How far back should we analyze? (Specify how many days to look back; default is 1 day)",
+        "input_mode": "select_or_input",
+        "options": [
+          {
+            "label": "(Recommended) 1 day (default)",
+            "value": "1"
+          },
+          {
+            "label": "3 days",
+            "value": "3"
+          },
+          {
+            "label": "7 days",
+            "value": "7"
+          },
+          {
+            "label": "14 days",
+            "value": "14"
+          },
+          {
+            "label": "30 days",
+            "value": "30"
+          }
+        ],
+        "required_if_missing": true
+      }
+    ]
+  },
+  "parameters": {
+    "jobset_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "default": ""
+    },
+    "project_number": {
+      "type": "string",
+      "default": ""
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace (default 'default')."
+    },
+    "restart_attempt": {
+      "type": "integer",
+      "default": -1,
+      "description": "JobSet restart attempt index (optional, default -1 to discover workload timestamps across all attempts in a single pass). When >= 0, filters timestamps specifically for this restart attempt."
+    },
+    "latest_attempts": {
+      "type": "integer",
+      "default": 0,
+      "description": "If > 0, discover distinct attempt numbers across the workload, sort descending, and return only the latest N attempts."
+    },
+    "window_minutes": {
+      "type": "integer",
+      "default": 5,
+      "description": "Trailing triage window duration in minutes prior to last_occurrence (default 5). Set <= 0 for full run window."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window start timestamp (RFC3339)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window end timestamp (RFC3339)."
+    },
+    "bucket": {
+      "type": "string",
+      "default": ""
+    },
+    "location": {
+      "type": "string",
+      "default": ""
+    },
+    "view": {
+      "type": "string",
+      "default": ""
+    },
+    "lookback_days": {
+      "type": "integer",
+      "default": 1,
+      "description": "Number of days to look back from the current time (or end timestamp) when an explicit start timestamp is not provided (default: 1 day)."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/lookup-workload-timestamps_output.json",
+      "description": "Path to write the structured JSON output."
+    }
+  }
+}

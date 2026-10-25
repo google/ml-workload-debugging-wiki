@@ -1,0 +1,54 @@
+{
+  "title": "Identify Outlier TPU Stack Trace",
+  "type": "action",
+  "description": "Enable stack traces on the workload (e.g., using --deploy-stacktrace-sidecar for XPK users) and query Cloud Logging for stack trace logs from the outlier TPU to determine if the hang is in the input pipeline.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hangs",
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --workload_name=${workload_name} --filter_extra=\"(\\\"Traceback (most recent call last)\\\" OR \\\"step-stack-status\\\" OR \\\"stacktrace\\\") ${outlier_host}\" --output_file=${output_file} --deduplicate=true --start=${start_time} --end=${end_time}",
+  "summary_fields": [
+    "original_count",
+    "deduplicated_count",
+    "error_fatal_count",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target TPU workload or JobSet name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "outlier_host": {
+      "type": "string",
+      "default": "",
+      "description": "Optional outlier TPU pod or host name filter."
+    },
+    "start_time": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window start timestamp (RFC3339)."
+    },
+    "end_time": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window end timestamp (RFC3339)."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/outlier_tpu_stack_traces.txt",
+      "description": "Output file path for extracted stack trace logs."
+    }
+  }
+}

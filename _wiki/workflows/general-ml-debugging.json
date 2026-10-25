@@ -1,0 +1,42 @@
+{
+  "title": "General ML Debugging",
+  "type": "workflow",
+  "description": "General diagnostic workflow for detecting TPU failures, querying crash signatures, mapping physical IDs to GKE instances, and mitigating hardware faults.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-07-30",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "root_cause",
+    "failing_nodes",
+    "remediation_status"
+  ],
+  "steps": [
+    "[[enable-tpu-verbose-logging]]",
+    "[[watch-pods-for-failure]]",
+    "[[query-crash-signatures]]",
+    "[[job-disruption-timeline]]",
+    "[[query-workload-logs]]",
+    "[[resolve-workload-nodes]]",
+    "[[extract-culprit-hosts]]",
+    "[[query-vm-termination-events]]",
+    "[[query-node-health-events]]",
+    "[[ai-hw-analyzer]]",
+    "[[pod-analyzer]]",
+    "[[ai-app-analyzer]]",
+    "[[map-physical-id-to-gke-instance]]",
+    "[[mitigate-tpu-hardware-fault]]",
+    "[[mitigate-and-escalate]]",
+    "[[ai-generate-failure-table]]"
+  ],
+  "step_notes": {
+    "ai-generate-failure-table": "Requires `hw_analysis`, `pod_analysis` and `app_analysis`. Those come from [[ai-hw-analyzer]], [[pod-analyzer]] and [[ai-app-analyzer]] respectively; without them the synthesis step has no inputs and will either fail interpolation or invent the three analyses.",
+    "job-disruption-timeline": "Supplies the restart-attempt timeline that [[ai-app-analyzer]] takes as `timeline_file` / `timeline_json`; without it the analyzer cannot size its per-attempt scan windows. Pass the run window as `start_timestamp` / `end_timestamp`, and treat the attempt list as a noisy draft, as [[workload-disruption-orchestration]] does."
+  }
+}

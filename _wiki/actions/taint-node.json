@@ -1,0 +1,40 @@
+{
+  "title": "Taint Node",
+  "type": "action",
+  "description": "Apply a taint to a GKE node. (Mutating Action)",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl taint nodes ${node_name} ${key}=${value}:${effect}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "node_name": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string",
+      "default": "debug-wiki-taint"
+    },
+    "value": {
+      "type": "string",
+      "default": "true"
+    },
+    "effect": {
+      "type": "string",
+      "default": "NoSchedule"
+    }
+  }
+}

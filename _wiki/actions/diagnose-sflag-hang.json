@@ -1,0 +1,57 @@
+{
+  "title": "Diagnose sflag Hang",
+  "type": "action",
+  "description": "Perform chronological ascending (--order=ASC) analysis of TensorCore/SparseCore sflag timeouts, SparseCore tag:pc sequencer halts, DCN action stalls, minority outlier grouping (< 20%), silent/missing pod detection across slice topologies, and concurrent telemetry host mapping using diagnose_sflag_hang.py.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "timeout",
+    "hangs"
+  ],
+  "created": "2026-07-20",
+  "updated": "2026-10-13",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/diagnose_sflag_hang.py ${workload_prefix} --project=${project} --freshness=${freshness} --expected_pods=${expected_pods} --max_concurrent_workers=${max_concurrent_workers} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "total_logs_analyzed",
+    "unique_reporting_pods",
+    "silent_pods_count",
+    "outlier_pods_count",
+    "primary_hang_cause",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload name or pod prefix (e.g. my-tpu-workload)."
+    },
+    "project": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window (defaults to 180d to avoid missing incidents older than 1 day)."
+    },
+    "expected_pods": {
+      "type": "integer",
+      "default": 0,
+      "description": "Optional expected worker pods per slice (0 auto-infers from observed <slice>-<worker> pod indices) for silent pod detection."
+    },
+    "max_concurrent_workers": {
+      "type": "integer",
+      "default": 10,
+      "description": "Maximum concurrent threads for parallel telemetry node-to-host resolution."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/sflag_hang_diagnosis.json",
+      "description": "Path to write the structured JSON diagnosis report."
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "title": "Describe Reservation Sub-blocks",
+  "type": "action",
+  "description": "Describe compute reservation sub-blocks details.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud beta compute reservations sub-blocks describe ${reservation_name} --block-name=${block_name} --sub-block-name=${sub_block_name} --project=${project_id} --zone=${zone}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "reservation_name": {
+      "type": "string"
+    },
+    "block_name": {
+      "type": "string"
+    },
+    "sub_block_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    }
+  }
+}

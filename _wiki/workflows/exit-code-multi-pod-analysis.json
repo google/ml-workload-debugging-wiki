@@ -1,0 +1,28 @@
+{
+  "title": "Exit Code Multi-Pod Analysis Workflow",
+  "type": "workflow",
+  "description": "Multi-pod exit code analysis SOP workflow for isolating primary failure exit codes across large scale multi-pod TPU workloads.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-07-23",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[query-pod-exit-codes]]",
+    "[[find-earliest-failure]]",
+    "[[get-node-from-pod-logs]]"
+  ]
+}

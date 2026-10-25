@@ -1,0 +1,28 @@
+{
+  "title": "KubeDNS Troubleshooting Workflow",
+  "type": "workflow",
+  "description": "KubeDNS troubleshooting SOP workflow for diagnosing DNS resolution timeouts, resolv.conf misconfigurations, and container log errors.",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-node-dns-resolv]]",
+    "[[query-kubedns-logs]]",
+    "[[check-pod-status]]",
+    "[[remediate-kubedns-resolution-failure]]"
+  ],
+  "step_notes": {}
+}

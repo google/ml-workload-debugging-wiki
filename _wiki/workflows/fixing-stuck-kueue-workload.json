@@ -1,0 +1,28 @@
+{
+  "title": "Fixing Stuck Kueue Workload",
+  "type": "workflow",
+  "description": "Last-resort kick for a Kueue workload stuck in QuotaReserved/Requeued: deactivate/activate it, only after confirming it has 0 pods left (none Terminating). Not for workloads with stuck Terminating pods (use kueue-stuck-termination-recovery).",
+  "internal_only": false,
+  "tags": [
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-localqueue-status]]",
+    "[[get-cluster-queues]]",
+    "[[deactivate-and-activate-kueue-workload]]"
+  ],
+  "step_notes": {
+    "deactivate-and-activate-kueue-workload": "Evicts and immediately re-admits the workload. Check its preconditions first (stuck admission, Kueue version without the fix, 0 pods left, no FailedKillPod events). See [[gotchas-kubernetes-gke]] gotcha 6."
+  }
+}

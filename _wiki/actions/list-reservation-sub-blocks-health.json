@@ -1,0 +1,43 @@
+{
+  "title": "List Reservation Sub-blocks Health",
+  "type": "action",
+  "description": "Read-only JSON listing of every sub-block in one GCE reservation block (for TPU7x one sub-block = one 4x4x4 cube = one GKE TPU node pool of 16 VMs). Read per sub-block: `name`, `physicalTopology.subBlock` (joins to the node label `cloud.google.com/gce-topology-subblock`), `healthInfo{healthStatus, degradedHostCount, degradedInfraCount, healthyHostCount}`, `inUseCount` and `reservationSubBlockMaintenance{maintenanceOngoingCount, instanceMaintenanceOngoingCount, upcomingGroupMaintenance.maintenanceStatus}`. Caveats: `healthyHostCount` reflects capacity assurance, not live VM placement, so a sub-block can report 16/16 healthy while one host cannot start a VM; `degradedInfraCount` > 0 while all 16 machines are serving points to an ICI/OCS infrastructure fault rather than a bad host. Cheap (~2.5 s in the source). Drill into a single sub-block with [[describe-reservation-sub-blocks]].",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "ironwood",
+    "capacity",
+    "triage"
+  ],
+  "created": "2026-09-29",
+  "updated": "2026-09-29",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud beta compute reservations sub-blocks list ${reservation_name} --block-name=${block_name} --zone=${zone} --project=${project_id} --format=json",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "timeout_seconds": 120,
+  "parameters": {
+    "reservation_name": {
+      "type": "string",
+      "description": "GCE reservation name."
+    },
+    "block_name": {
+      "type": "string",
+      "description": "FULL reservation block name, e.g. <reservation>-block-0001 (not just the block index)."
+    },
+    "zone": {
+      "type": "string",
+      "description": "Zone of the reservation."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project that owns the reservation."
+    }
+  }
+}

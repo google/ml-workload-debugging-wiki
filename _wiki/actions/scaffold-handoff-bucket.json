@@ -1,0 +1,37 @@
+{
+  "title": "Scaffold Handoff Bucket",
+  "type": "action",
+  "description": "Provisions the multi-job diagnostic incident structure on GCS (BUCKET_STRUCTURE.md directory dictionary, support case link). Never pre-creates empty directory markers (.keep), manifests, READMEs or failure tables; directories in GCS are created on-demand as real files are uploaded. Requires an explicit bucket.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "gcp"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-05",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "tools/scripts/handoff/scaffold_bucket.sh ${storage_key} --bucket=${bucket}$(if [ -n '${job}' ]; then echo \" --job=${job}\"; fi)",
+  "summary_fields": [
+    "status",
+    "output_file"
+  ],
+  "parameters": {
+    "storage_key": {
+      "type": "string",
+      "description": "Storage key (support case number or key)"
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name (e.g. example-debug-bucket or destination bucket)"
+    },
+    "job": {
+      "type": "string",
+      "default": "",
+      "description": "Optional target workload job name"
+    }
+  }
+}

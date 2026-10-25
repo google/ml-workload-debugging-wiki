@@ -1,0 +1,65 @@
+{
+  "title": "Query ICI Diagnostic Logs",
+  "type": "action",
+  "description": "Query Cloud Logging for `XLA_SDC_CHECKER`, `ICI transfer wait`, and `Wait timeout on sflag` logs emitted by XLA ICI straggler instrumentation (`ici-sdc-test` configured with `xla_tpu_enable_sdc_checker=true`, `xla_tpu_sdc_check_repeat_count=0`, `xla_tpu_sdc_check_halt_on_detection=false`, `xla_tpu_ici_sdc_test_max_distance=1`, `xla_tpu_ici_sdc_test_pipeline_depth=13`, `xla_tpu_ici_sdc_test_buffer_size_chunks=256`, `xla_tpu_ici_sdc_test_packet_size_chunks=256`, `xla_tpu_ici_sdc_test_iterations=5000`, `xla_tpu_ici_sdc_test_run_on_program_start=true`, `xla_tpu_enable_log_recorder=true`, `xla_tpu_ici_sdc_test_sflag_wait_timeout_ms=5`, surfaced via XSC/LLO Logger callbacks or MXLA coordinator debug callbacks).",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "timeout",
+    "collective_communication"
+  ],
+  "created": "2026-10-13",
+  "updated": "2026-10-13",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --workload_name=${workload_name} --last_occurrence=${last_occurrence} --start=\"${start}\" --end=\"${end}\" --restart_attempt=${restart_attempt} --output_file=${output_file} --limit=${limit} --filter_extra=\"\\\"XLA_SDC_CHECKER\\\" OR \\\"ICI transfer wait\\\" OR \\\"Wait timeout on sflag\\\"\" --unmask=true --deduplicate=false",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Workload or jobset name prefix."
+    },
+    "restart_attempt": {
+      "type": "integer",
+      "default": -1,
+      "description": "JobSet restart attempt index (optional, default -1 to query all attempts across the window)."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Window start (RFC3339)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Window end (RFC3339)."
+    },
+    "last_occurrence": {
+      "type": "string",
+      "default": "",
+      "description": "Optional timestamp baseline; defaults to current UTC time if omitted."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000,
+      "description": "Maximum log entries to return."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/queried_logs.txt",
+      "description": "Output path for unmasked ICI diagnostic logs."
+    }
+  }
+}

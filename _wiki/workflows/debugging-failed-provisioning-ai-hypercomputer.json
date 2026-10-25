@@ -1,0 +1,26 @@
+{
+  "title": "Workflow for Debugging Failed Provisioning Requests in AI Hypercomputer",
+  "type": "workflow",
+  "description": "This is a specialized subset of [[workload-disruption-orchestration]]. It handles failures tightly coupled to provisioning, targeting AI Hypercomputer specifically. Use [[workload-disruption-orchestration]] for full ML workload failure triage.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[describe-reservation]]",
+    "[[describe-reservation-sub-blocks]]"
+  ],
+  "step_notes": {}
+}

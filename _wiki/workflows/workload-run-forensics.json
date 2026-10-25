@@ -1,0 +1,56 @@
+{
+  "title": "Workload Run Forensics (Multi-Run Scheduling and Crash Triage)",
+  "type": "workflow",
+  "description": "Read-only end-to-end forensics workflow for a GKE TPU JobSet series that won't schedule ('allows to fit only N out of M slice(s)') or keeps failing across runs. Recovers deleted JobSet specs from GKE audit logs, builds a per-run exclusion and placement table, decodes Kueue TAS buckets into 4x4x4 cubes, computes the per-run cube ledger and known-bad cube visibility, checks TPU_STDERR_LOG_LEVEL failure observability before searching for Megascale digests, and verifies every claim with ai-verify-failure-attribution.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "ironwood",
+    "gke",
+    "kueue",
+    "scheduling",
+    "capacity",
+    "mxla",
+    "logging",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "workload_state",
+    "per_run_table",
+    "cube_ledger_formula",
+    "observability_gaps",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[classify-workload-state]]",
+    "[[list-jobset-runs]]",
+    "[[recover-jobset-spec-from-audit]]",
+    "[[scheduled-events-by-pool]]",
+    "[[decode-tas-pending-message]]",
+    "[[cube-ledger]]",
+    "[[check-failure-observability]]",
+    "[[query-workload-logs]]",
+    "[[resolve-workload-nodes]]",
+    "[[extract-culprit-hosts]]",
+    "[[ai-verify-failure-attribution]]"
+  ],
+  "step_notes": {
+    "classify-workload-state": "Step 0: Classify the workload or series of runs into NEVER_ADMITTED, ADMITTED_NOT_PLACED, PLACED_THEN_CRASHED, MIXED_UNSCHEDULED_AND_CRASHED, or HUNG from Kubernetes events and audit logs.",
+    "list-jobset-runs": "Step 1: Enumerate every run matching the workload prefix (including deleted or recreated runs that reuse a JobSet name) with created (PDT and UTC), admitted, and outcome timestamps.",
+    "recover-jobset-spec-from-audit": "Step 2: Recover each run's pod template from GKE audit io.k8s.batch.v1.jobs.create request bodies (jobset-controller-manager writes these even when jobsets.create is absent). Extract nodeSelector, NotIn node-pool exclusions, 4x4x4-state pin, and queue name per run; never infer one run's affinity from a sibling run.",
+    "scheduled-events-by-pool": "Step 3: Group Scheduled events by (run, node_pool) to see which started runs landed on suspect or known-bad pools (e.g. DCN-bad cubes).",
+    "decode-tas-pending-message": "Step 4: Read QuotaReserved / TAS messages in ascending order (--order=asc) to catch two-pass quota masking ('insufficient unused quota' hiding topology failure) and decode each 'excluded: affinity A, resource R, taint T' bucket into 4x4x4 cubes (divide by 16).",
+    "cube-ledger": "Steps 5 & 6: Compute the full cube ledger for each pending run (usable cubes allowed by state pin - self-excluded pools - cubes held by other queues = free cubes vs needed) without running a full pod LIST, and check whether known-bad pools are visible to the scheduler via cluster taints or only avoided by per-user NotIn lists. Any taint or cordon is a recommendation only (requires_approval: true; ask the user before running).",
+    "check-failure-observability": "Steps 8 & 10: Detect the framework (PyTorch/torch_xla, JAX, or Pathways) and effective TPU_STDERR_LOG_LEVEL / TPU_MIN_LOG_LEVEL from the pod spec. At the default TPU_STDERR_LOG_LEVEL=3 (FATAL), LOG(ERROR) Megascale digests ('Megascale detects a hang', 'Full error digest') never reach Cloud Logging; report the observability gap, recommend TPU_STDERR_LOG_LEVEL=2 and TPU_MIN_LOG_LEVEL=0, and skip broad digest searches. Also check whether any cited known bug's signature appears in this workload's logs; if 0 hits, label the link circumstantial.",
+    "query-workload-logs": "Step 9: Scope log queries to the coordinator pod (<jobset>-<job>-0-0 for PyTorch/MCJax, pathways-rm for Pathways) and narrow crash window to distinguish the hang digest branch from the non-hang 'Aborting the coordinator as an unrecoverable error is reported from one or more workers' branch ([[megascale-hang]]) and repeat-offender pools across runs ([[multi-workload-triage]]).",
+    "resolve-workload-nodes": "Before step 12, placed runs only (PLACED_THEN_CRASHED, MIXED_UNSCHEDULED_AND_CRASHED, HUNG): resolve each crashed run's node set over that run's window. Its result is the `node_set_json` that [[ai-verify-failure-attribution]] checks for COMPLETE scope.",
+    "extract-culprit-hosts": "Before step 12, placed runs only: quote culprit hosts from the crashed runs' own log lines. Its output file is the `culprit_hosts_file` that [[ai-verify-failure-attribution]] cross-checks every attribution against.",
+    "ai-verify-failure-attribution": "Step 12: Mandatory verification gate before publishing the report ([[run-forensics-report-template]]). Verifies run scope on every claim, time-aligned evidence, complete cube ledger accounting, 'would the remediation help?' math, and zero unapproved mutations. Pass the drafted report as `failure_table`. When no run was placed (NEVER_ADMITTED, ADMITTED_NOT_PLACED), skip [[resolve-workload-nodes]] and [[extract-culprit-hosts]] and pass 'not applicable: no run was placed' for `node_set_json` and `culprit_hosts_json`, so the gate checks the scheduling claims instead of inventing a node set."
+  }
+}

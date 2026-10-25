@@ -1,0 +1,26 @@
+{
+  "title": "Log Ingestion Pipeline",
+  "type": "workflow",
+  "description": "Pipeline for standardizing and filtering workspace logs. This is a sub-component that feeds into the analysis steps defined in [[workload-disruption-orchestration]].",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-24",
+  "updated": "2026-09-18",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[lookup-workload-timestamps]]",
+    "[[query-workload-logs]]"
+  ],
+  "step_notes": {}
+}

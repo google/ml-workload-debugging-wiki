@@ -1,0 +1,29 @@
+{
+  "title": "Tail Coordinator Logs",
+  "type": "action",
+  "description": "Tail logs for the coordinator pod.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-06-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "tail -n 100 ${log_path}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "log_path": {
+      "type": "string"
+    }
+  }
+}

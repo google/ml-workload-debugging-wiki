@@ -1,0 +1,26 @@
+{
+  "title": "MCJax Workload Debugging Playbook",
+  "type": "workflow",
+  "description": "A subset workflow detailing McJAX specific investigations. For a holistic view that covers broader node and application level failures, refer to the superset [[workload-disruption-orchestration]].",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[query-exit-codes]]",
+    "[[query-workload-logs]]"
+  ],
+  "step_notes": {}
+}

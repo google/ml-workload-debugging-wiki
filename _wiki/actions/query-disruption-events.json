@@ -1,0 +1,33 @@
+{
+  "title": "Query Disruption Events",
+  "type": "action",
+  "description": "Query GKE cluster events for VM staydown and machine group eviction disruption messages.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault"
+  ],
+  "created": "2026-06-17",
+  "updated": "2026-06-17",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get events -n ${namespace} --sort-by='.metadata.creationTimestamp' | grep -E \"Eviction due to machine group\"",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "namespace": {
+      "type": "string",
+      "default": "default"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    }
+  }
+}

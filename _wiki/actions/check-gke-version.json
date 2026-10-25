@@ -1,0 +1,26 @@
+{
+  "title": "Check GKE Node Versions",
+  "type": "action",
+  "description": "Inspects the GKE cluster node versions to check if the nodes are running a version older than 1.35.0-gke.2479000.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "pathways",
+    "analysis"
+  ],
+  "sources": [
+    "symptoms/pathways-expected-topology-mismatch.md"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get nodes -o custom-columns=NAME:.metadata.name,VERSION:.status.nodeInfo.kubeletVersion",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {}
+}

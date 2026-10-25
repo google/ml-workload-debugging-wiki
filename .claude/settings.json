@@ -1,0 +1,63 @@
+{
+  "workspace": {
+    "root": ".",
+    "wikiDirectory": "_wiki",
+    "agentsDirectory": ".claude/agents",
+    "commandsDirectory": ".claude/commands"
+  },
+  "permissions": {
+    "deny": [
+      "Read(**/solution.json)",
+      "Read(**/solution.json.bak)",
+      "Read(**/problem.json)",
+      "Read(**/mock_data/**)",
+      "Read(**/eval_mock_db/**)",
+      "Read(**/test_cases/**/solution*)",
+      "Read(**/.*.real)",
+      "Read(/workspace/**)",
+      "Read(/usr/local/google/home/**)"
+    ]
+  },
+  "ignorePatterns": [
+    "**/scratch/**",
+    "**/_wiki/scratch/**",
+    "**/.venv/**",
+    "**/_wiki/.venv/**",
+    "**/.gemini/**",
+    "**/__pycache__/**",
+    "**/*.pyc"
+  ],
+  "executionGuidance": {
+    "relativePathsOnly": true,
+    "forbiddenPaths": [
+      "/workspace/",
+      "/usr/local/google/home/",
+      "/workspace/internal/"
+    ],
+    "linterCommand": "python3 _wiki/wiki_linter.py",
+    "glueRunnerCommand": "python3 _wiki/tools/scripts/python_glue_runner.py",
+    "actionExecutionModes": {
+      "command": {
+        "dispatch": "glueRunner",
+        "namingConvention": null,
+        "description": "Deterministic bash-executable scripts and CLI tools. Invoke via glueRunnerCommand; never interpolate and run the native bash template directly."
+      },
+      "ai": {
+        "dispatch": "subagentPromptTask",
+        "namingConvention": "ai-",
+        "requiredInstruction": "ai-action",
+        "promptField": "prompt",
+        "parameterPlaceholderStyles": [
+          "${name}",
+          "<name>"
+        ],
+        "description": "Agent prompt tasks. Interpolate the action's prompt template and dispatch it as a subagent task (Claude Code: Agent tool; Antigravity: invoke_subagent). Do NOT route through glueRunnerCommand and do NOT substitute ad-hoc analysis for the prompt."
+      },
+      "manual": {
+        "dispatch": "surfaceToUser",
+        "namingConvention": null,
+        "description": "Steps that cannot be automated. Surface the instruction text to the user."
+      }
+    }
+  }
+}

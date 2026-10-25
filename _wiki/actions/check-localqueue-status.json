@@ -1,0 +1,29 @@
+{
+  "title": "Check LocalQueue Status",
+  "type": "action",
+  "description": "Inspect a Kueue LocalQueue to verify resource usage and flavors allocation.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "scheduling"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-06-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl describe lq ${queue_name}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "queue_name": {
+      "type": "string",
+      "default": "multislice-queue"
+    }
+  }
+}

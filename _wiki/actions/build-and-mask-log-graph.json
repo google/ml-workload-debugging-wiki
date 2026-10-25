@@ -1,0 +1,32 @@
+{
+  "title": "Build and Mask Log Graph",
+  "type": "action",
+  "description": "Builds a hierarchical log graph from a raw log file and pipes it directly into the masking tool.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "methodology"
+  ],
+  "created": "2026-07-05",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/build_log_graph.py --log-file=${log_file} --format=json | python3 tools/scripts/mask_segment_tool.py --format=json --output-format=${output_format}",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "log_file": {
+      "type": "string",
+      "description": "Local file path to build graph directly from log lines"
+    },
+    "output_format": {
+      "type": "string",
+      "description": "Output format ('text', 'json')",
+      "default": "json"
+    }
+  }
+}

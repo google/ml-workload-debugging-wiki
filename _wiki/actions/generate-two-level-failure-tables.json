@@ -1,0 +1,44 @@
+{
+  "title": "Generate Two-Level Failure Tables",
+  "type": "action",
+  "description": "Generates Level A (infrastructure/hardware) and Level B (job progression) failure tables strictly adhering to /troubleshoot schema standards.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis",
+    "hardware_fault"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/generate_failure_table.py --findings=${findings} --stage=${stage} --table_type=${table_type} --output_dir=${output_dir} --bucket=${bucket}",
+  "summary_fields": [
+    "status",
+    "output_file"
+  ],
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "stage": {
+      "type": "string",
+      "description": "Handoff stage: handoff or verdict"
+    },
+    "table_type": {
+      "type": "string",
+      "description": "Table format: both, summary, or timeline"
+    },
+    "output_dir": {
+      "type": "string",
+      "description": "Output directory for generated markdown tables"
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Optional GCS bucket override"
+    }
+  }
+}

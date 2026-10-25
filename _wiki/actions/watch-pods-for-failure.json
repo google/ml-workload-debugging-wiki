@@ -1,0 +1,32 @@
+{
+  "title": "Watch Pods For Failure",
+  "type": "action",
+  "description": "Watch pods in a live workload to see which one transitions from Running to Error first. The watch is BOUNDED via --request-timeout because `kubectl -w` never returns on its own.",
+  "internal_only": false,
+  "tags": [
+    "kubernetes",
+    "gke",
+    "triage"
+  ],
+  "created": "2026-07-30",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pods -w --request-timeout=${watch_seconds}s | grep ${workload_name}",
+  "summary_fields": [
+    "first_failing_pod"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Prefix of the workload or job name."
+    },
+    "watch_seconds": {
+      "type": "integer",
+      "default": 120,
+      "description": "Bounded watch duration in seconds. `kubectl -w` streams indefinitely and the glue runner captures output to completion, so an unbounded watch hangs the run."
+    }
+  }
+}

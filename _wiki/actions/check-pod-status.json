@@ -1,0 +1,27 @@
+{
+  "title": "Check Pod Status",
+  "type": "action",
+  "description": "[Only for actively running/recent workloads] Check GKE pod status filtered by workload name.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pods | grep ${workload_name}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    }
+  }
+}

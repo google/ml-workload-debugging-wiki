@@ -1,0 +1,29 @@
+{
+  "title": "Mitigate and Escalate",
+  "type": "action",
+  "description": "Cordon the node to prevent new workloads from landing on it. File a hardware replacement ticket with the data center team.",
+  "internal_only": false,
+  "tags": [
+    "hardware_fault",
+    "training"
+  ],
+  "created": "2026-06-04",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl cordon ${node_name}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "node_name": {
+      "type": "string",
+      "description": "Name of the node to cordon"
+    }
+  }
+}

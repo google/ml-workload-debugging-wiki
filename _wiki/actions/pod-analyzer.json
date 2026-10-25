@@ -1,0 +1,50 @@
+{
+  "title": "Pod Analyzer Manual Action",
+  "type": "action",
+  "description": "Determine whether the workload's pods scheduled and started correctly, in two stages (Kueue admission / kube-scheduler, then kubelet sandbox, image pull and volume mount). Both queries match failure events only, so an empty result is reported as INCONCLUSIVE unless an explicit window was supplied -- it is not evidence the pods were healthy.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --pod_analyzer_mode --workload_name=${workload_name} --project_id=${project_id} --start=${start} --end=${end} --limit=${limit} --output_file=${output_file}",
+  "summary_fields": [
+    "overall_status",
+    "failure_stage",
+    "events_examined",
+    "window_applied",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    },
+    "start": {
+      "type": "string",
+      "description": "RFC3339 start of the run window. Required to reach a historical incident: without it gcloud applies a 1-day default freshness and the analyzer reports INCONCLUSIVE_NO_EVENTS_FOUND rather than a verdict."
+    },
+    "end": {
+      "type": "string",
+      "description": "RFC3339 end of the run window."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/pod_analyzer_report.json",
+      "description": "Destination for the JSON report. Must live under scratch/."
+    }
+  }
+}

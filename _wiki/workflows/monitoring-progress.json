@@ -1,0 +1,31 @@
+{
+  "title": "Active Monitoring of MCJax GKE Workloads",
+  "type": "workflow",
+  "description": "Monitor active training job progress by fetching workload run timestamps, querying ML Diagnostics monitored events and analyzer reports on GKE (>= 1.36.0-gke.4447000), and querying runtime logs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "monitoring",
+    "gke"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-07",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-pod-status]]",
+    "[[query-mldiagnostics-monitored-events]]",
+    "[[tail-coordinator-logs]]"
+  ],
+  "step_notes": {
+    "query-mldiagnostics-monitored-events": "On GKE clusters running version 1.36.0-gke.4447000 and later with hypercomputecluster.googleapis.com enabled, queries automatic machineLearningRun records (<job-name>-<timestamp>) to diagnose silent metric-only PERFORMANCE_DEGRADATION bottlenecks (>= 15% duty cycle drop after the 15-minute duty cycle warmup gate from the last notification time) across 11 subsystems (CPU/Host RAM cgroup saturation, HBM capacity/bandwidth, thermal/power/ICI/ToR throttling, port-9431 PyGrain/Async Checkpointing stalls, and negative hardware rule-out via not_detected_analyzers) plus AutoCaptured XProf .xplane.pb traces (profiler_sessions). For crashes, hangs, restarts, preemptions, or <15m startup/restore stalls, use [[debugging-megascale-hangs]] or [[workload-disruption-orchestration]] instead."
+  }
+}

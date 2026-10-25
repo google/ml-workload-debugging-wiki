@@ -1,0 +1,73 @@
+{
+  "title": "Query Crash Signatures",
+  "type": "action",
+  "description": "Query for software crash and signal-death signatures across a workload prefix to catch silent failures, scoped by default to the active incident attempt window (or trailing duration_minutes around last_occurrence / incident attempt) to avoid expensive multi-day sweeps and log query rate-limiting. Covers Python-level crashes (Fatal Python error, Traceback) and process kills (SIGILL/SIGSEGV/SIGABRT/SIGBUS/SIGFPE, FailureSignalHandler). Note: `si_code=0` on a signal means SI_USER -- the signal was sent via kill() by another process, NOT raised by the CPU. To query across multi-day spans without clamping, pass full_window=true.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-07-30",
+  "updated": "2026-10-21",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --workload_name=${workload_name} --filter_extra=\"(\\\"Fatal Python error\\\" OR \\\"Traceback\\\" OR \\\"Segmentation fault\\\" OR \\\"SIGABRT\\\" OR \\\"SIGILL\\\" OR \\\"SIGSEGV\\\" OR \\\"SIGBUS\\\" OR \\\"SIGFPE\\\" OR \\\"FailureSignalHandler\\\" OR \\\"received by PID\\\" OR \\\"Out of memory\\\")\" --output_file=${output_file} --deduplicate=true --start=${start} --end=${end} --last_occurrence=${last_occurrence} --duration_minutes=${duration_minutes} --coordinator_only=${coordinator_only} --full_window=${full_window} --limit=${limit}",
+  "summary_fields": [
+    "original_count",
+    "deduplicated_count",
+    "error_fatal_count",
+    "output_file"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Workload or jobset name prefix."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/crash_signatures.txt",
+      "description": "Output path for the queried logs."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start (RFC3339). Scoped to incident attempt window.",
+      "default": ""
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end (RFC3339).",
+      "default": ""
+    },
+    "last_occurrence": {
+      "type": "string",
+      "description": "Incident or crash timestamp (RFC3339). When start is not set, queries a trailing window around this timestamp.",
+      "default": ""
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "description": "Log lookback duration in minutes (default 5).",
+      "default": 5
+    },
+    "coordinator_only": {
+      "type": "boolean",
+      "description": "Restrict queries to coordinator/head pods.",
+      "default": false
+    },
+    "full_window": {
+      "type": "boolean",
+      "description": "Explicitly allow multi-day sweeps without clamping to trailing duration_minutes.",
+      "default": false
+    },
+    "limit": {
+      "type": "integer",
+      "description": "Log read limit. The script defaults to 100, which silently truncates a whole-window sweep.",
+      "default": 5000
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "title": "MXLA Hardware Triage Workflow",
+  "type": "workflow",
+  "description": "General multi-slice MXLA hardware fault isolation SOP workflow for tracing TPU execution hangs across any topology size to uncorrectable HBM ECC memory faults and bad host instances. Reference [[kueue-stuck-termination-recovery]] playbook if jobs get stuck in termination due to RIP repair. If OOM during compilation: run maxtext.trainers.pre_train.train_compile offline and pass compile_xla_flags='--xla_dump_to=/tmp/xla_dump/ --xla_dump_hlo_as_text=True' to dump HLO locally.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "hangs",
+    "mxla"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[get-slices]]",
+    "[[map-physical-id-to-gke-instance]]",
+    "[[trace-hbm-ecc-errors]]",
+    "[[mitigate-tpu-hardware-fault]]"
+  ],
+  "step_notes": {}
+}

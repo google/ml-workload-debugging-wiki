@@ -1,0 +1,36 @@
+{
+  "title": "Find Earliest Failure",
+  "type": "action",
+  "description": "List the earliest failure indicators sorted by timestamp to find the FIRST failure in a cascade. Covers container exits (EXIT_CODE=) AND process deaths (crash signals, pipe breaks), because a container exit is usually downstream of the death that caused it.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'resource.labels.pod_name:\"${workload_name}-\" AND (\"EXIT_CODE=\" OR \"received by PID\" OR \"FailureSignalHandler\" OR \"lost connection to peer\")' --format=\"value(timestamp, resource.labels.pod_name, textPayload)\" --project ${project_id} --freshness=180d --limit=${limit} | sort | head -n 25",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "The name prefix of the workload/jobset."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "The GCP project ID."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    }
+  }
+}

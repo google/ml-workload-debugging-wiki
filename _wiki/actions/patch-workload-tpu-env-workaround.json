@@ -1,0 +1,54 @@
+{
+  "title": "Patch Workload with TPU Env Workaround",
+  "type": "action",
+  "description": "Applies a temporary environment variable workaround to a workload (JobSet) by injecting TPU_ACCELERATOR_TYPE, TPU_CHIPS_PER_HOST_BOUNDS, and TPU_HOST_BOUNDS variables into all pod templates.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "tpu",
+    "pathways"
+  ],
+  "sources": [
+    "symptoms/pathways-expected-topology-mismatch.md"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/kueue_recovery_actions.py patch-tpu-env --workload_name=\"${workload_name}\" --workload_type=\"${workload_type}\" --namespace=\"${namespace}\" --tpu_accelerator_type=\"${tpu_accelerator_type}\" --tpu_chips_per_host_bounds=\"${tpu_chips_per_host_bounds}\" --tpu_host_bounds=\"${tpu_host_bounds}\"",
+  "summary_fields": [
+    "execution_status",
+    "patched_objects"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace of the target workload."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Target workload or JobSet name."
+    },
+    "workload_type": {
+      "type": "string",
+      "default": "jobset",
+      "description": "Kubernetes resource type (e.g. jobset)."
+    },
+    "tpu_accelerator_type": {
+      "type": "string",
+      "description": "e.g. v5litepod-256"
+    },
+    "tpu_chips_per_host_bounds": {
+      "type": "string",
+      "description": "e.g. 2,2,1"
+    },
+    "tpu_host_bounds": {
+      "type": "string",
+      "description": "e.g. 2,2,1"
+    }
+  }
+}

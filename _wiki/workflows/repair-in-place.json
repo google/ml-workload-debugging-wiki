@@ -1,0 +1,31 @@
+{
+  "title": "Repair & Replace (R&R) and Restart in Place Workflow",
+  "type": "workflow",
+  "description": "Narrow workflow for executing node Repair & Replace (R&R) and Restart in Place actions. This is called as a mitigation path within the broader [[node-isolation-and-rr-api]] superset workflow.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[resolve-workload-nodes]]",
+    "[[extract-culprit-hosts]]",
+    "[[get-nodes-taints]]",
+    "[[isolate-node-via-rr-label]]"
+  ],
+  "step_notes": {
+    "extract-culprit-hosts": "A culprit host must be QUOTED from Pathways' own logs, never inferred and never taken from whatever node a listing happened to return. [[extract-culprit-hosts]] is the only step that produces an attributed node, and it decides repeat offenders on distinct primary incidents rather than raw event counts. Running node drain / fault-behavior labeling without it hands an approval-gated, capacity-destroying action a target with no provenance.",
+    "resolve-workload-nodes": "Establishes the authoritative node scope. Confirm `status: COMPLETE` first; over an INCOMPLETE set every downstream hardware verdict is inconclusive rather than negative."
+  }
+}

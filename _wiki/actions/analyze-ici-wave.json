@@ -1,0 +1,45 @@
+{
+  "title": "Analyze ICI Delay Wave",
+  "type": "action",
+  "description": "Deterministic diagnostic action to trace `ici-sdc-test` iteration progression, identify minimum iteration N_min S0 cores with SEND sync flag stalls versus downstream RECV-DONE stalls, and isolate culprit chip coordinates.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "timeout",
+    "collective_communication"
+  ],
+  "created": "2026-09-26",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/analyze_ici_wave.py --workload_name=\"${workload_name}\" --project_id=\"${project_id}\" $(if [ -n '${logs_file}' ]; then echo \"--logs_file=${logs_file}\"; fi) $(if [ -n '${logs}' ]; then echo \"--logs=${logs}\"; fi)",
+  "summary_fields": [
+    "root_cause",
+    "min_iteration",
+    "s0_culprit_chips",
+    "culprit_pods"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target TPU workload name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "logs": {
+      "type": "string",
+      "default": "",
+      "description": "Raw or formatted log entries containing XLA_SDC_CHECKER, ICI transfer wait, or sflag timeout telemetry."
+    },
+    "logs_file": {
+      "type": "string",
+      "default": "scratch/queried_logs.txt",
+      "description": "Optional path to a scratch file containing pulled ICI diagnostic logs (from query-ici-logs)."
+    }
+  }
+}

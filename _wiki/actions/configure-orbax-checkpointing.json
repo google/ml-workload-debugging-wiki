@@ -1,0 +1,23 @@
+{
+  "title": "Configure Orbax Checkpointing",
+  "type": "action",
+  "description": "Adjust Orbax/JAX checkpointing settings to mitigate slow step time or checkpoint corruption issues.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "To configure JAX/Orbax checkpointing settings:\n1. Open the application's configuration or training code.\n2. Ensure JAX/Orbax APIs are initialized with standard buffer sizes.\n3. Adjust the checkpoint config to write larger consolidated files (e.g. 200MB default size) rather than high-frequency small files.\n4. Verify that GCS write intervals are scaled appropriately to prevent hitting GCS API rate limits.\n\nNote on coordinator bottlenecks: In distributed JAX/Orbax checkpointing, GCS directory operations and folder deletions are executed exclusively by **worker 0 (JAX process zero)** (pod `*-worker-0`). When GCS deletion operations stall, worker 0 is the blocked coordinator, while workers 1..N wait and hit secondary barrier timeouts. Always explicitly attribute the blocked coordinator to **worker 0 (JAX process zero)**.",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "parameters": {}
+}

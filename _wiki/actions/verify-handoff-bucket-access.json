@@ -1,0 +1,37 @@
+{
+  "title": "Verify Handoff Bucket Access",
+  "type": "action",
+  "description": "Pre-flight GCS prober verifying bucket existence, write/read connectivity via canary probe, and public access prevention.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "gcp"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/verify_handoff_bucket_access.py --bucket=${bucket}$(if [ -n '${storage_key}' ]; then echo \" --storage_key=${storage_key}\"; fi)",
+  "summary_fields": [
+    "status",
+    "bucket",
+    "bucket_exists",
+    "write_accessible",
+    "read_accessible",
+    "public_access_prevention"
+  ],
+  "parameters": {
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name"
+    },
+    "storage_key": {
+      "type": "string",
+      "default": "",
+      "description": "Target storage key"
+    }
+  }
+}

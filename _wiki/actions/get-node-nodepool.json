@@ -1,0 +1,28 @@
+{
+  "title": "Get Node Nodepool",
+  "type": "action",
+  "description": "Get the nodepool name for a GKE node.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get node ${node_name} -o jsonpath='{.metadata.labels.cloud\\.google\\.com/gke-nodepool}'",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "node_name": {
+      "type": "string"
+    }
+  }
+}

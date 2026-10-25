@@ -1,0 +1,30 @@
+{
+  "title": "Log Processing and Classification Pipeline",
+  "type": "workflow",
+  "description": "Shared pipeline block to build log graphs, mask sensitive tokens, classify log severities, and unmask for readability. Steps 1-2 ([[build-log-graph]] then [[mask-segment]]) may be collapsed into the single fused action [[build-and-mask-log-graph]], which pipes the graph directly into the masker in one process and avoids writing an intermediate file; prefer the fused form when the intermediate graph is not needed on disk.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-24",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[build-log-graph]]",
+    "[[mask-segment]]",
+    "[[ai-classify-log-severities]]",
+    "[[unmask-logs]]"
+  ],
+  "step_notes": {
+    "build-log-graph": "Emits the hierarchical graph to disk. If the intermediate graph is not needed, use [[build-and-mask-log-graph]] instead, which fuses this step with [[mask-segment]] via a pipe."
+  }
+}

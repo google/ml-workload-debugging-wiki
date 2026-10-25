@@ -1,0 +1,85 @@
+{
+  "title": "Query Workload Logs",
+  "type": "action",
+  "description": "Optimized workload log query action that leverages the shared log ingestion and deduplication pipeline ([[log-ingestion-pipeline]]).",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --workload_name=${workload_name} --last_occurrence=${last_occurrence} --start=\"${start}\" --end=\"${end}\" --restart_attempt=${restart_attempt} --output_file=${output_file} --limit=${limit} --filter_extra=\"${filter_extra}\" --deduplicate=true --severity_filter=\"${severity_filter}\" --max_lines=${max_lines} --unmask=${unmask}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "description": "GKE cluster name. Currently informational only -- `pull_and_format_logs.py` scopes by `resource.labels.pod_name` and exposes no cluster flag, so this value is NOT applied to the query. Left declared because callers pass it and it documents which cluster the run belongs to; do not read a result as cluster-scoped on the strength of it."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Workload / jobset name prefix."
+    },
+    "restart_attempt": {
+      "type": "integer",
+      "default": -1,
+      "description": "JobSet restart attempt index (optional, default -1 to query all attempts across the window in a single pass). When >= 0, filters logs specifically for this restart attempt."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Window start (RFC3339). With --end, queries the whole window in a single pass."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Window end (RFC3339)."
+    },
+    "filter_extra": {
+      "type": "string",
+      "default": "",
+      "description": "Additional log filter expressions."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000,
+      "description": "Maximum log entries to return. Saturation is silent: if original_count == limit the result is truncated and proves nothing negative -- re-run narrowed or with a higher limit."
+    },
+    "last_occurrence": {
+      "type": "string",
+      "default": "",
+      "description": "Optional timestamp baseline; defaults to current UTC time if omitted."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/queried_logs.txt",
+      "description": "Output path for formatted and deduplicated logs."
+    },
+    "severity_filter": {
+      "type": "string",
+      "default": ""
+    },
+    "max_lines": {
+      "type": "integer",
+      "default": 1000
+    },
+    "unmask": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

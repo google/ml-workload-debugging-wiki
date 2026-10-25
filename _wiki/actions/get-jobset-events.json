@@ -1,0 +1,32 @@
+{
+  "title": "Get JobSet Events",
+  "type": "action",
+  "description": "Query events for a specific JobSet.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get events -n ${namespace} --field-selector involvedObject.name=${jobset_name}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "jobset_name": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default"
+    }
+  }
+}

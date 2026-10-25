@@ -1,0 +1,42 @@
+{
+  "title": "Query KubeDNS Logs",
+  "type": "action",
+  "description": "Query Cloud Logging for kube-system KubeDNS and NodeLocalDNS container logs to check for i/o timeouts and resolution failures.",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-07-23",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'resource.type=\"k8s_container\" AND resource.labels.namespace_name=\"kube-system\" AND resource.labels.cluster_name=\"${cluster_name}\" AND (resource.labels.container_name=\"kubedns\" OR resource.labels.container_name=\"node-cache\")' --project ${project_id} --limit 50 --freshness=${freshness}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "cluster_name": {
+      "type": "string",
+      "description": "The GKE cluster name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "The GCP project ID."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}

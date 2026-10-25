@@ -1,0 +1,52 @@
+{
+  "title": "Trace HBM ECC Errors",
+  "type": "action",
+  "description": "Query host kernel and driver diagnostic logs for uncorrectable HBM ECC memory errors and PCIe bus faults on target TPU machines.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "triage"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --resource_type=\"gce_instance\" --filter_extra=\"\\\"${host_id}\\\" AND jsonPayload.message=~\\\"HBM ECC uncorrectable error|Fatal TPU PCIe\\\"\" --limit=${limit} --output_file=${output_file} --start=${start} --end=${end}",
+  "summary_fields": [
+    "original_count",
+    "deduplicated_count",
+    "error_fatal_count",
+    "output_file"
+  ],
+  "parameters": {
+    "host_id": {
+      "type": "string",
+      "description": "Host/machine identifier, GCE instance name or instance id. REQUIRED for scoping: without it the query returns HBM ECC errors for every instance in the project, which reads as this host being faulty when the errors belong elsewhere. Matched as text so either an instance name or a numeric id works."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "The GCP project ID."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 200,
+      "description": "Log read limit. Raised from the previous hardcoded 20, which silently truncated; if original_count equals this, the result is truncated and not a negative."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/hbm_ecc_errors.txt",
+      "description": "Output path for the queried logs."
+    },
+    "start": {
+      "type": "string",
+      "description": "RFC3339 start of the window. Required: without it the query falls back to gcloud's 1-day freshness, and 'no uncorrectable HBM ECC errors on this host' becomes a false negative -- the negative that decides whether a host is isolate."
+    },
+    "end": {
+      "type": "string",
+      "description": "RFC3339 end of the window."
+    }
+  }
+}

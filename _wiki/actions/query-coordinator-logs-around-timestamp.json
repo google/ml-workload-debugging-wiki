@@ -1,0 +1,45 @@
+{
+  "title": "Query Coordinator Logs Around Timestamp",
+  "type": "action",
+  "description": "Query all logs from the coordinator pod in a 10-minute window (5 minutes before, 5 minutes after) around a target timestamp to capture the full failure context and hang digest.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "timeout",
+    "training"
+  ],
+  "created": "2026-06-13",
+  "updated": "2026-06-13",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --workload_name=${workload_name} --last_occurrence=${timestamp} --coordinator_only --restart_attempt=${restart_attempt} --limit=${limit} --output_file=scratch/coordinator_logs.txt",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "restart_attempt": {
+      "type": "integer",
+      "default": -1,
+      "description": "JobSet restart attempt index (optional, default -1 to query logs across all attempts in one pass). When >= 0, filters logs specifically for this restart attempt."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000,
+      "description": "Maximum log entries to query."
+    }
+  }
+}

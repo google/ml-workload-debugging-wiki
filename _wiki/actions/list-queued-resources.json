@@ -1,0 +1,31 @@
+{
+  "title": "List Queued Resources",
+  "type": "action",
+  "description": "List compute queued resources in a zone.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-06-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud alpha compute tpus queued-resources list --zone=${zone} --project=${project_id}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "zone": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    }
+  }
+}

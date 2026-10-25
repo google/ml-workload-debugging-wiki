@@ -1,0 +1,4 @@
+absl-py
+google-cloud-logging
+pyyaml
+pytest

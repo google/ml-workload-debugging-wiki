@@ -1,0 +1,29 @@
+{
+  "title": "Configure Megascale Timeout Flags",
+  "type": "action",
+  "description": "Adjust Megascale barrier, error reporting, and graph hang threshold flags to customize timeout behavior or gather more debugging information.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "timeout",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "To configure Megascale timeout flags:\n1. Open your training workload's run/startup script or JobSet YAML (where `LIBTPU_INIT_ARGS` / JAX and XLA parameters are defined).\n2. Append the following flags -- `${flags}` -- to the command line or target environment parameters:\n   --megascale_graph_hang_threshold=10m\n   --megascale_graph_within_launch_hang_threshold=10m\n   --megascale_send_rpc_timeout=90s\n3. (Optional) For detailed barrier synchronization debugging, enable:\n   --xla_tpu_enable_megascale_barrier=true\n4. Restart the workload to apply.",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "parameters": {
+    "flags": {
+      "type": "string",
+      "description": "The exact flag string to append. Interpolated into the instruction; without it the instruction says 'append the following flags' and then lists none."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Workflow for Debugging Failed Provisioning Requests",
+  "type": "workflow",
+  "description": "Diagnose traditional GKE TPU provisioning failures by listing and describing Queued Resource objects in GCE.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[describe-queued-resource]]",
+    "[[list-queued-resources]]",
+    "[[describe-reservation]]",
+    "[[describe-reservation-sub-blocks]]"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Redact Diagnostic Artifacts",
+  "type": "action",
+  "description": "Sanitizes proprietary tensor names, shapes, and customer code paths from textual HLO graphs and stack traces.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/redact_diagnostic_payload.py --file=${file} --output_file=${output_file}",
+  "summary_fields": [
+    "status",
+    "output_file"
+  ],
+  "parameters": {
+    "file": {
+      "type": "string",
+      "description": "Single HLO or text file to redact"
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Sanitized file destination"
+    }
+  }
+}

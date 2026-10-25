@@ -1,0 +1,63 @@
+{
+  "title": "Query Exit Codes",
+  "type": "action",
+  "description": "Scan a SINGLE workload's logs for exit-code lines via the shared log ingestion and deduplication pipeline ([[ai-triage-classify-and-mask-logs]]). Use this to see the exit codes in context alongside surrounding log lines. For a cross-pod tally of which pods exited non-zero, use [[query-pod-exit-codes]] instead, which aggregates via the Python native API rather than scanning logs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --limit=${limit} --project_id=${project_id} --workload_name=${workload_name} --last_occurrence=${last_occurrence} --start=\"${start}\" --end=\"${end}\" --restart_attempt=${restart_attempt} --output_file=${output_file} --deduplicate=true",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "The name prefix of the workload/jobset."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "The GCP project ID."
+    },
+    "restart_attempt": {
+      "type": "integer",
+      "default": -1,
+      "description": "JobSet restart attempt index (optional, default -1 to scan across all attempts in one pass). When >= 0, filters logs specifically for this restart attempt."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window start timestamp (RFC3339)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional window end timestamp (RFC3339)."
+    },
+    "last_occurrence": {
+      "type": "string",
+      "default": "",
+      "description": "Optional timestamp baseline; defaults to current UTC time if omitted."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/exit_codes.txt",
+      "description": "Output path for deduplicated exit code logs."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    }
+  }
+}

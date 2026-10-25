@@ -1,0 +1,40 @@
+{
+  "title": "Resolve Cluster Metadata",
+  "type": "action",
+  "description": "Inspects GKE cluster properties to determine TPU accelerator generation (e.g. tpu7x, v6e, v5p), backing GCE reservation, and region.",
+  "internal_only": false,
+  "tags": [
+    "monitoring",
+    "triage",
+    "capacity"
+  ],
+  "created": "2026-09-24",
+  "updated": "2026-09-24",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/resolve_cluster_metadata.py --cluster '${cluster_name}' --project '${project_id}' --location '${location}'",
+  "summary_fields": [
+    "cluster_name",
+    "project_id",
+    "location",
+    "generation",
+    "reservation",
+    "status"
+  ],
+  "parameters": {
+    "cluster_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "default": ""
+    },
+    "location": {
+      "type": "string",
+      "default": "us-central1"
+    }
+  }
+}

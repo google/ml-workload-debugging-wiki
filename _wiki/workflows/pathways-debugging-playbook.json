@@ -1,0 +1,30 @@
+{
+  "title": "Pathways on Cloud Workload Debugging Playbook",
+  "type": "workflow",
+  "description": "Comprehensive playbook for debugging Pathways workloads, covering cluster connectivity, service readiness, and worker pod/log status.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[verify-jobset-status]]",
+    "[[get-system-pods]]",
+    "[[get-jobset-events]]",
+    "[[query-workload-logs]]",
+    "[[get-jobset-leader-logs]]"
+  ],
+  "step_notes": {}
+}

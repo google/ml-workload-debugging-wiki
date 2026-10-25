@@ -1,0 +1,30 @@
+{
+  "title": "Pathways Topology Mismatch Triage Workflow",
+  "type": "workflow",
+  "description": "Triage and mitigate Pathways expected topology mismatch errors by checking GKE versions, inspecting TPU environment variables, applying temporary workarounds, and upgrading clusters.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways"
+  ],
+  "sources": [
+    "symptoms/pathways-expected-topology-mismatch.md"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-gke-version]]",
+    "[[inspect-pod-env-variables]]",
+    "[[patch-workload-tpu-env-workaround]]",
+    "[[upgrade-gke-cluster]]"
+  ]
+}

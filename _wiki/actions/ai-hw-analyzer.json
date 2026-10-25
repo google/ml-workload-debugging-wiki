@@ -1,0 +1,54 @@
+{
+  "title": "AI Hardware Interruption Analyzer",
+  "type": "action",
+  "description": "Interprets the audit-log evidence gathered by [[query-vm-termination-events]], together with in-node evidence, to decide whether a workload disruption was caused by an underlying hardware failure or VM termination. This action does NOT run the audit query itself: the query is deterministic and lives in [[query-vm-termination-events]], so that it is reproducible and always node-scoped. This action supplies the judgement the raw query cannot.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis",
+    "hardware_fault"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "Decide whether the disruption of `${workload_name}` at `${disruption_timestamp}` was caused by an underlying hardware failure or VM termination.\n\nNode scope: ${node_set_json}\nAudit-log evidence: ${vm_termination_events_json}\nIn-node crash signatures (optional): ${crash_signatures_json}\n\nDo NOT run the audit query yourself — [[query-vm-termination-events]] already ran it, deterministically and node-scoped. Your job is interpretation. Use live evidence only; there is no mock path for this action.\n\n1. **Scope check FIRST.** Read the node set `status`. If it is `INCOMPLETE`, return an inconclusive verdict and say which nodes were unverified. Never assert a fleet-wide negative over a partial node set.\n2. **Interpret the audit evidence.** Attribute each event to a specific node of THIS workload. If `event_count` is 0, no GCE-layer intervention touched this workload's nodes in the window. Remember the evidence is already scoped — do not reintroduce project-wide events, which in a busy project routinely include dozens of unrelated preemptions.\n3. **Then check in-node evidence, because a real fault can be entirely invisible at the GCE layer.** Review the crash signatures and the `k8s_node` / node-problem-detector logs for the culprit hosts. Run [[query-node-health-events]] to collect them, scoped with the `node_name_filter_clause` from [[resolve-workload-nodes]] -- NOT the `node_filter_clause`, which matches `protoPayload.resourceName`, a field that exists only on audit entries and never on `k8s_node` entries; do not improvise a query, and do not skip this step because the audit log was clean -- a clean audit log is exactly the case where in-node evidence decides the verdict. Note any worker killed by a signal with `si_code=0` (SI_USER = delivered via `kill()` by another process, NOT a CPU trap). A clean audit log plus in-node worker kills is a real and common pattern; report it as such rather than concluding the hardware was healthy.\n4. **Do not treat preemption wording as preemption evidence.** `EXIT_TYPE_QUICKLY_DURING_PREEMPTION`, `\"Resource manager is being preempted\"`, and `\"Received SIGTERM ... forwarding as a preemption notification\"` are emitted for ANY SIGTERM. A preemption claim requires a matching audit event on one of this workload's own nodes.\n5. **Return a SCOPED verdict.** Always state what was checked, e.g. `No VM Termination (checked all 65 nodes across 4 node groups, 07:45-10:05)`. Never return a bare `No VM Termination`: read alone it means 'no hardware problem' and has caused genuine faults to be dismissed. Where the layers disagree, say so explicitly, e.g. `No VM Termination (all 65 nodes, 07:45-10:05), but 3 workers killed by SIGILL si_code=0 on gke-tpu-node-xxxx and gke-tpu-node-xxxx; fault is invisible at the GCE layer`.\nNote: If a file path (e.g. `_file`) is provided for inputs like timeline or crash_signatures (e.g. `scratch/*.json`), read directly from the scratch file on disk to avoid context window blowup, rather than expecting a large inline JSON string.",
+  "summary_fields": [
+    "verdict",
+    "scope_checked",
+    "culprit_nodes",
+    "gce_layer_events"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "disruption_timestamp": {
+      "type": "string"
+    },
+    "node_set_json": {
+      "type": "string",
+      "description": "Output of [[resolve-workload-nodes]]; the authoritative node scope, including its COMPLETE/INCOMPLETE status."
+    },
+    "vm_termination_events_json": {
+      "type": "string",
+      "description": "Output of [[query-vm-termination-events]]; the audit-log evidence to interpret."
+    },
+    "crash_signatures_json": {
+      "type": "string",
+      "default": "",
+      "description": "Optional output of [[query-crash-signatures]], for correlating in-node process kills."
+    },
+    "crash_signatures_file": {
+      "type": "string",
+      "description": "Path to a file containing the crash signatures (e.g. scratch/crashes.json). Preferred over crash_signatures_json."
+    },
+    "vm_termination_events_file": {
+      "type": "string",
+      "description": "Path to a file containing vm_termination_events. Preferred over inline json to avoid context blowup."
+    }
+  }
+}

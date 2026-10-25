@@ -1,0 +1,30 @@
+{
+  "title": "Mitigate TPU Hardware Fault",
+  "type": "action",
+  "description": "Restart the TPU workload once (only after the previous attempt's pods are gone) to test for a transient fault. If the same TPU worker shows up as an outlier repeatedly, capture the host information and request Google to isolate the bad host.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "Mitigate a suspected TPU hardware fault on host `${host_name}`:\n1. Precondition for any restart: the previous attempt has 0 pods left (`kubectl get pods -n <ns> | grep <workload>` returns nothing, including Terminating pods) and no `FailedKillPod` events (`kubectl get events -n <ns> --field-selector reason=FailedKillPod`). If pods are stuck Terminating, do NOT restart or resubmit: a new slice can be formed on TPUs still held by the old containers and take down many hosts at once. Follow [[kueue-stuck-termination-recovery]] and [[gotchas-kubernetes-gke]] instead. Once the precondition holds, ask the workload owner (this action restarts nothing itself) to restart once to verify whether the hang/interruption is transient.\n2. If it fails again, analyze the coordinator logs to locate outlier TPU workers, and confirm whether `${host_name}` is among them.\n3. Verify whether `${host_name}` repeatedly shows up as the outlier. Count distinct *incidents*, not raw log lines: a single host death is reported by every surviving peer at once, so event counts inflate one failure into dozens.\n4. If it is a repeat offender, extract its GCE host/node mapping and isolate it. For GKE-managed TPUs use [[isolate-node-via-rr-label]] via [[node-isolation-and-rr-api]]; isolate-node-via-rr-label is cluster-only and does not apply to a GKE node.",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "host_name": {
+      "type": "string",
+      "description": "The suspected culprit host, quoted from logs rather than inferred from device coordinates."
+    }
+  }
+}

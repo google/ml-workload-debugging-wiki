@@ -1,0 +1,25 @@
+{
+  "title": "Enable TPU Verbose Logging",
+  "type": "action",
+  "description": "Enable verbose logging for TPUs based on the debug ml workloads guide. (Sets TPU_VMODULE, TPU_STDERR_LOG_LEVEL, TPU_MIN_LOG_LEVEL, TF_CPP_MIN_LOG_LEVEL)",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "timeout",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "To enable verbose TPU runtime logging on your workload:\n1. Open your workload's JobSet YAML or container startup configuration.\n2. Set the following environment variables in the TPU worker container `env:` specification (or export them in the container startup script before launching Python/JAX):\n   - `TPU_VMODULE=slice_configuration=1,real_program_continuator=1`\n   - `TPU_STDERR_LOG_LEVEL=0`\n   - `TPU_MIN_LOG_LEVEL=0`\n   - `TF_CPP_MIN_LOG_LEVEL=0`\n3. Redeploy the workload so `libtpu` emits program enqueue (`Enqueueing program`) and completion (`last_finished_run_id`) messages to Cloud Logging.",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {}
+}

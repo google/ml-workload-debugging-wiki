@@ -1,0 +1,49 @@
+{
+  "title": "AI Classify Log Severities",
+  "type": "action",
+  "description": "AI-operated batch action to classify log severities and identify unassigned host mentions.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-21",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "You are a specialized worker subagent. You are NOT the main coordinator agent. Your sole task is to analyze the log lines directly and return the JSON array format. Do NOT delegate or try to route this task to other subagents. You have NO tools available. Do NOT attempt to use any tools or make any tool calls. Output the final answer directly. Generate a JSON array of objects. For each log entry, create an object in the array with the fields: \"id\" (the log ID), \"severity\" (DEBUG, INFO, WARN, ERROR, FATAL), and \"has_mentioned_host\" (boolean indicating whether the log mentions any host placeholder [HOST_NAME_N] that is NOT in the mapped hosts list. Mapped hosts: ${assigned_hosts}). Analyze the following logs independently: ${logs}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "logs_file": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "assigned_hosts_file": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "mappings_file": {
+      "type": "string",
+      "default": "",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "assigned_hosts": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "string"
+    }
+  }
+}

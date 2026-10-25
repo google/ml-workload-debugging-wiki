@@ -1,0 +1,31 @@
+{
+  "title": "Hardware Exclusion Test Workflow",
+  "type": "workflow",
+  "description": "Isolate faulty TPU nodes by temporarily tainting the node in GKE, having the workload owner restart the workload (only once the previous attempt has 0 pods left: none Terminating, no FailedKillPod events; otherwise see kueue-stuck-termination-recovery), and node replacement the host if failures persist.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[resolve-workload-nodes]]",
+    "[[extract-culprit-hosts]]",
+    "[[get-node-nodepool]]",
+    "[[isolate-node-via-rr-label]]"
+  ],
+  "step_notes": {
+    "extract-culprit-hosts": "A culprit host must be QUOTED from Pathways' own logs, never inferred and never taken from whatever node a listing happened to return. [[extract-culprit-hosts]] is the only step that produces an attributed node, and it decides repeat offenders on distinct primary incidents rather than raw event counts. Running an isolate without it hands an approval-gated, capacity-destroying action a target with no provenance.",
+    "resolve-workload-nodes": "Establishes the authoritative node scope. Confirm `status: COMPLETE` first; over an INCOMPLETE set every downstream hardware verdict is inconclusive rather than negative."
+  }
+}

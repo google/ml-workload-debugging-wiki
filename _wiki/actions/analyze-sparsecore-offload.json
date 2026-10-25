@@ -1,0 +1,57 @@
+{
+  "title": "Analyze SparseCore Offload and Sync Failures",
+  "type": "action",
+  "description": "Deterministic diagnostic action to triage SparseCore (SC) offload mismatches (`--xla_tpu_enable_sparse_core_mismatch_detector=true`), SparseCore HBM/SRAM/Smem OOMs, and TensorCore-to-SparseCore `sflag` synchronization timeouts.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "hardware_fault",
+    "timeout",
+    "analysis"
+  ],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/analyze_sparsecore_offload.py --workload_name=${workload_name} --project_id=${project_id} --logs_file=${logs_file} --logs=${logs} --start_time=${start_time} --end_time=${end_time} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "sc_failure_mode",
+    "culprit_sc_cores",
+    "offending_op_or_pc",
+    "root_cause"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target TPU workload name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "logs": {
+      "type": "string",
+      "description": "Raw or formatted log entries containing SparseCore mismatch, sequencer halt, or sflag timeout telemetry."
+    },
+    "logs_file": {
+      "type": "string",
+      "description": "Optional file path containing the workload logs (e.g. scratch/queried_logs.txt)."
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 start timestamp for log query fallback."
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 end timestamp for log query fallback."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Optional output JSON path (default 'scratch/sparsecore_offload_analysis.json')."
+    }
+  }
+}

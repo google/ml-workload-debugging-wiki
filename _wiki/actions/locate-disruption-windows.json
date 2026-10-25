@@ -1,0 +1,66 @@
+{
+  "title": "Locate Disruption Windows",
+  "type": "action",
+  "description": "Reads a workload's JobSet/Job Kubernetes events (BackoffLimitExceeded, RestartJobSetFailurePolicyAction, SliceDeleted, suspend/resume) to find every restart and the final teardown, and emits padded, merged time windows. These events are small and cheap to query, so the windows let expensive container-log queries (node resolution, culprit extraction) be confined to where the disruptions happened. Does not replace the full-window crash sweep: a disruption the workload recovered from without a JobSet restart leaves no event here.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/locate_disruption_windows.py --workload_name=${workload_name} --project_id=${project_id} --start=${start} --end=${end} --namespace=${namespace} --padding_minutes=${padding_minutes} --output_file=${output_file} --limit=${limit}",
+  "summary_fields": [
+    "status",
+    "total_events",
+    "restarts",
+    "teardown",
+    "windows",
+    "truncated",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "JobSet workload name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start, UTC YYYY-MM-DDTHH:MM:SSZ (the full run window)."
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace of the JobSet."
+    },
+    "padding_minutes": {
+      "type": "integer",
+      "default": 15,
+      "description": "Minutes added on each side of every restart/backoff/teardown event before overlapping windows are merged."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/disruption_windows.json"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 2000,
+      "description": "Entry cap per one-day slice; a capped slice sets truncated=true."
+    }
+  }
+}

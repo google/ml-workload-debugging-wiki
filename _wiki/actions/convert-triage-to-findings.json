@@ -1,0 +1,49 @@
+{
+  "title": "Convert Triage to Findings",
+  "type": "action",
+  "description": "Bridges /troubleshoot triage state JSON into canonical troubleshoot_findings.json conforming to Schema v2.2.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/convert_triage_to_findings.py$(if [ -n '${triage_json}' ]; then echo \" --triage_json=${triage_json}\"; fi)$(if [ -n '${workload}' ]; then echo \" --workload=${workload}\"; fi) --case_id=${case_id} --output_file=${output_file} --bucket=${bucket}",
+  "summary_fields": [
+    "status",
+    "workload",
+    "case_id",
+    "bucket",
+    "proves_count",
+    "cannot_prove_count"
+  ],
+  "parameters": {
+    "triage_json": {
+      "type": "string",
+      "default": "",
+      "description": "Path to input triage state JSON"
+    },
+    "workload": {
+      "type": "string",
+      "default": "",
+      "description": "Optional target workload name to automatically locate newest scratch triage state JSON"
+    },
+    "case_id": {
+      "type": "string",
+      "description": "Primary Support Case ID"
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Destination troubleshoot_findings.json file path"
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name"
+    }
+  }
+}

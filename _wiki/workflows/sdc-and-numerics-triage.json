@@ -1,0 +1,34 @@
+{
+  "title": "SDC Checksum Mismatch and Numerics Error Triage Workflow",
+  "type": "workflow",
+  "description": "Standard diagnostic workflow for triaging Silent Data Corruption (`XLA_SDC_CHECKER` checksum mismatches), LLO deterministic replay failures, SparseCore offload mismatches, and NaN/Inf numerical divergence across TPU slices. Directly addresses [[sdc-checksum-mismatch]] and [[mxla-hardware-fault]].",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "training",
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "execution_status",
+    "failure_classification",
+    "culprit_hosts_or_pods",
+    "failing_operations",
+    "remediation_status"
+  ],
+  "steps": [
+    "[[query-workload-logs]]",
+    "[[triage-sdc-and-numerics]]",
+    "[[analyze-sparsecore-offload]]",
+    "[[get-node-from-pod-logs]]",
+    "[[inspect-hlo-dumps]]",
+    "[[isolate-node-via-rr-label]]"
+  ],
+  "step_notes": {}
+}

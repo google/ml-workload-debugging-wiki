@@ -1,0 +1,39 @@
+{
+  "title": "Check RM Readiness",
+  "type": "action",
+  "description": "[Pathways Only] Check Resource Manager logs for readiness messages.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'resource.type=\"k8s_container\" AND resource.labels.project_id=\"${project_id}\" AND resource.labels.cluster_name=\"${cluster_name}\" AND resource.labels.pod_name:\"${jobset_name}-rm-0\" AND (\"serving on\" OR \"Slices Now Ready\")' --project ${project_id} --freshness=${freshness}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string"
+    },
+    "cluster_name": {
+      "type": "string"
+    },
+    "jobset_name": {
+      "type": "string"
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}

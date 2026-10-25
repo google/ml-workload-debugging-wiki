@@ -1,0 +1,57 @@
+{
+  "title": "Triage SDC Checksum Mismatch and Numerics Errors",
+  "type": "action",
+  "description": "Deterministic diagnostic action to analyze XLA Silent Data Corruption (SDC / XSC) checksum mismatch logs (`XLA_SDC_CHECKER`), LLO deterministic replay and runtime bounds check failures, and NaN/Inf numerics divergence across retries and hosts to classify hardware defects vs XLA compiler bugs vs application non-determinism.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "training",
+    "analysis",
+    "triage"
+  ],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/triage_sdc_and_numerics.py --workload_name=${workload_name} --project_id=${project_id} --logs_file=${logs_file} --logs=${logs} --start_time=${start_time} --end_time=${end_time} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "failure_classification",
+    "culprit_hosts_or_pods",
+    "failing_operations",
+    "root_cause"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target TPU workload name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "logs": {
+      "type": "string",
+      "description": "Raw or formatted log entries containing XLA_SDC_CHECKER, checksum mismatch, BoundsCheck, or NaN/Inf telemetry."
+    },
+    "logs_file": {
+      "type": "string",
+      "description": "Optional file path containing the workload logs (e.g. scratch/queried_logs.txt)."
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 start timestamp for log query fallback."
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 end timestamp for log query fallback."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Optional output JSON path (default 'scratch/sdc_numerics_triage.json')."
+    }
+  }
+}

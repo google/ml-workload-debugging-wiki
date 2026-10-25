@@ -1,0 +1,33 @@
+{
+  "title": "Change Workload Priority Class",
+  "type": "action",
+  "description": "Change the priority of a queued Kueue workload (JobSet). Queue-owner decision only, not a scheduling test: a higher priority preempts lower-priority workloads (other teams' slices) in the same ClusterQueue/cohort.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "scheduling"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "Run by the queue/cluster owner after agreeing with the affected teams. Never use `kubectl replace --force` on a JobSet: it deletes and recreates the JobSet immediately, so the new pods and slice can land while the old TPU pods are still terminating (see [[kueue-stuck-termination-recovery]]).\n1. If the workload's priority comes from a Kueue WorkloadPriorityClass (label `kueue.x-k8s.io/priority-class`), change it in place to `${priority}`: the Kueue Workload CRD (v0.17) allows changing a WorkloadPriorityClass name while quota is reserved, but not a pod PriorityClass name.\n2. Otherwise delete and resubmit: `kubectl delete jobset ${workload_name} -n <ns> --cascade=foreground`, wait until `kubectl get pods -n <ns> | grep ${workload_name}` returns nothing (no Terminating pods, no `FailedKillPod` events), then resubmit with `priorityClassName: ${priority}`.\n3. Restore the original priority after the urgent run so other users are not starved.",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "description": "Target priority class name agreed with the queue owner."
+    }
+  }
+}

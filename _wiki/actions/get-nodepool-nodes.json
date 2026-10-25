@@ -1,0 +1,28 @@
+{
+  "title": "Get Nodepool Nodes",
+  "type": "action",
+  "description": "List all nodes in a GKE nodepool.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get nodes -l cloud.google.com/gke-nodepool=${nodepool_name}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "nodepool_name": {
+      "type": "string"
+    }
+  }
+}

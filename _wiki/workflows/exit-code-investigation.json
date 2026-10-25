@@ -1,0 +1,27 @@
+{
+  "title": "Exit Code Investigation",
+  "type": "workflow",
+  "description": "Identify the root cause of a workload failure by analyzing the exit codes (see [[exit-codes]]) returned by various workers. Run [[query-workload-logs]] specifically for slice 0 / worker 0 for the last 30 mins if Exit Code 143 or empty exit code from eviction is present to check for step-timebomb.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[query-exit-codes]]",
+    "[[find-earliest-failure]]",
+    "[[query-workload-logs]]"
+  ],
+  "step_notes": {}
+}

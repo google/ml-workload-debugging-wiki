@@ -1,0 +1,41 @@
+{
+  "title": "Upgrade GKE Cluster Version",
+  "type": "action",
+  "description": "Steps to upgrade the GKE cluster control plane and node pools to a version that natively includes the ICI topology wrap-around fix (>= 1.35.0-gke.2479000).",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "pathways"
+  ],
+  "sources": [
+    "symptoms/pathways-expected-topology-mismatch.md"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud container clusters upgrade ${cluster_name} --master --cluster-version=${target_version} --location=${location} --project=${project_id} --quiet",
+  "summary_fields": [
+    "execution_status",
+    "target_entity",
+    "status"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "cluster_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "target_version": {
+      "type": "string",
+      "description": "Target GKE version (e.g. 1.35.0-gke.2479000)"
+    }
+  }
+}

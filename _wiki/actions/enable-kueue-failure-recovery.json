@@ -1,0 +1,36 @@
+{
+  "title": "Enable Kueue Failure Recovery Policy",
+  "type": "action",
+  "description": "Patches the Kueue controller manager configuration to turn on the FailureRecoveryPolicy feature gate.",
+  "internal_only": false,
+  "tags": [
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/kueue_recovery_actions.py enable-feature-gate --cluster_name=\"${cluster_name}\" --location=\"${location}\" --kueue_version=\"${kueue_version}\"",
+  "summary_fields": [
+    "execution_status",
+    "affected_resources"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "cluster_name": {
+      "type": "string",
+      "description": "Target GKE cluster name."
+    },
+    "location": {
+      "type": "string",
+      "description": "GKE cluster region or zone."
+    },
+    "kueue_version": {
+      "type": "string",
+      "description": "Installed Kueue version (must be >= 0.15.0)."
+    }
+  }
+}

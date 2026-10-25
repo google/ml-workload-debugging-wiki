@@ -1,0 +1,34 @@
+{
+  "title": "libtpu Timing Outlier Analysis Workflow",
+  "type": "workflow",
+  "description": "Diagnostic workflow for detecting and analyzing libtpu step time outliers and long step time anomalies across multi-host workers.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "analysis",
+    "logging",
+    "observability",
+    "metrics",
+    "hangs"
+  ],
+  "sources": [
+    "playbooks/libtpu-enqueue-timing-analysis.md"
+  ],
+  "created": "2026-09-01",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "total_raw_events",
+    "total_workers",
+    "total_cycles",
+    "outlier_workers_count"
+  ],
+  "steps": [
+    "[[query-workload-logs]]",
+    "[[analyze-libtpu-timing]]"
+  ],
+  "step_notes": {}
+}

@@ -1,0 +1,25 @@
+{
+  "title": "List Unique Started Pods",
+  "type": "action",
+  "description": "List unique pods that logged startup milestones from Cloud Logging.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pods -l app=pathways-worker -o jsonpath='{.items[*].metadata.name}'",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {}
+}

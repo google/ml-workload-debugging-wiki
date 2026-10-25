@@ -1,0 +1,41 @@
+{
+  "title": "Locate Megascale Hang Timestamp",
+  "type": "action",
+  "description": "Locate the exact timestamp of the 'Megascale detects a hang' log message in the coordinator logs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "timeout",
+    "training"
+  ],
+  "created": "2026-06-13",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'resource.labels.pod_name=~\"${workload_name}-(worker(s)?|worker-job0|pathways-head)-0-0-.*\" AND \"Megascale detects a hang\"' --project ${project_id} --order=ASC --format=\"value(timestamp)\" --limit=${limit} --freshness=${freshness}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}
