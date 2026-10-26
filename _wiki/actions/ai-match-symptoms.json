@@ -1,0 +1,44 @@
+{
+  "title": "AI Match Symptoms",
+  "type": "action",
+  "description": "AI-operated semantic matching between classified log entries and documented symptom signatures.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-21",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "You are a specialized diagnostic triage assistant. Analyze the following error log lines and match them semantically against the catalog of documented symptoms. Documented Symptoms:\n${symptoms}\n\nLogs to match:\n${logs}\n\nReturn a JSON list of objects. For each log line that matches a symptom, create an object with fields:\n- \"id\": (integer, log ID)\n- \"symptom_page\": (string, the exact filename of the matched symptom playbook, e.g. \"session-failing\")\n- \"confidence\": (string, HIGH, MEDIUM, LOW)\n- \"reason\": (string, brief semantic match explanation)\n\nOnly return matches with HIGH or MEDIUM confidence. Output the JSON list directly.",
+  "summary_fields": [
+    "matched_symptoms_count",
+    "primary_severity",
+    "classification_output",
+    "output_file"
+  ],
+  "parameters": {
+    "triage_results_file": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "symptoms_dir": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Consumed by a special-case in `python_glue_runner.py` keyed on this parameter's NAME rather than by any placeholder in the prompt, so renaming it silently breaks the wiring."
+    },
+    "symptoms": {
+      "type": "string"
+    },
+    "logs": {
+      "type": "string"
+    }
+  }
+}

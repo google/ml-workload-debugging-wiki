@@ -1,0 +1,38 @@
+{
+  "title": "Scale DNS Pod Replicas",
+  "type": "action",
+  "description": "Scale CoreDNS or KubeDNS autoscaler deployment replicas proportional to TPU worker node count for multi-slice workloads.",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage",
+    "tpu"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl scale deployment ${deployment_name} -n ${namespace} --replicas=${replicas}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "deployment_name": {
+      "type": "string",
+      "description": "Name of the DNS autoscaler deployment."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Namespace of the DNS deployment."
+    },
+    "replicas": {
+      "type": "string",
+      "description": "Target number of replicas for scaling."
+    }
+  }
+}

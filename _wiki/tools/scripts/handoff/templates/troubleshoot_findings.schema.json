@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "workload-handoff/troubleshoot_findings.schema.json",
+  "title": "Troubleshoot Findings (single source of truth for workload-handoff)",
+  "description": "Extracted VERBATIM from a Debug Wiki /troubleshoot report. Every manifest, README, failure table and partner issue body is rendered from this file only. Unknown values must be null (never guessed); report errors go in 'discrepancies'.",
+  "type": "object",
+  "required": ["source", "identity"],
+  "definitions": {
+    "nstr": {"type": ["string", "null"]},
+    "nnum": {"type": ["number", "string", "null"]},
+    "nint": {"type": ["integer", "null"]},
+    "strlist": {"type": "array", "items": {"type": "string"}},
+    "window": {
+      "type": ["object", "null"],
+      "properties": {
+        "start": {"$ref": "#/definitions/nstr"},
+        "end": {"$ref": "#/definitions/nstr"},
+        "step_time_sec": {"$ref": "#/definitions/nnum"}
+      }
+    }
+  },
+  "properties": {
+    "source": {
+      "type": "object",
+      "required": ["troubleshoot_session", "report_path"],
+      "properties": {
+        "troubleshoot_session": {"$ref": "#/definitions/nstr"},
+        "report_path": {"$ref": "#/definitions/nstr"},
+        "extracted_at": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["case_id", "storage_key"],
+      "properties": {
+        "case_id": {"$ref": "#/definitions/nstr", "description": "Support case number."},
+        "storage_key": {"$ref": "#/definitions/nstr", "description": "GCS folder key: gs://<bucket>/<storage_key>/. Normally the support case number."},
+        "issue_id": {"$ref": "#/definitions/nstr", "description": "Partner issue number. null until the issue is filed."},
+        "project_id": {"$ref": "#/definitions/nstr"},
+        "project_number": {"$ref": "#/definitions/nstr"},
+        "cluster": {"$ref": "#/definitions/nstr"},
+        "zone": {"$ref": "#/definitions/nstr"},
+        "reservation": {"$ref": "#/definitions/nstr"},
+        "workload": {"$ref": "#/definitions/nstr"},
+        "accelerator_type": {"$ref": "#/definitions/nstr"},
+        "chip_count": {"$ref": "#/definitions/nint"},
+        "node_count": {"$ref": "#/definitions/nint"},
+        "slice_count": {"$ref": "#/definitions/nint"}
+      }
+    },
+    "category": {
+      "type": ["string", "null"],
+      "description": "step_time | memory | orchestration | hardware | sdc (or canonical category_N_* name)."
+    },
+    "windows": {
+      "type": ["object", "null"],
+      "properties": {
+        "degraded": {"$ref": "#/definitions/window"},
+        "baseline": {"$ref": "#/definitions/window"}
+      }
+    },
+    "proves": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^P[0-9]+$"},
+          "text": {"type": "string"},
+          "evidence_refs": {"$ref": "#/definitions/strlist"}
+        }
+      }
+    },
+    "cannot_prove": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^C[0-9]+$"},
+          "text": {"type": "string"}
+        }
+      }
+    },
+    "evidence_table": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {"$ref": "#/definitions/nstr"},
+          "worker": {"$ref": "#/definitions/nstr"},
+          "gke_node": {"$ref": "#/definitions/nstr"},
+          "observation": {"$ref": "#/definitions/nstr"},
+          "context": {"$ref": "#/definitions/nstr"},
+          "log_ref": {"$ref": "#/definitions/nstr"},
+          "artifact_refs": {"$ref": "#/definitions/strlist"}
+        }
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "attempt": {"type": ["string", "integer", "null"]},
+          "jobset_uid": {"$ref": "#/definitions/nstr"},
+          "start": {"$ref": "#/definitions/nstr"},
+          "end": {"$ref": "#/definitions/nstr"},
+          "step_time_sec": {"$ref": "#/definitions/nnum"},
+          "exit": {"$ref": "#/definitions/nstr"},
+          "notes": {"$ref": "#/definitions/nstr"},
+          "artifact_refs": {"$ref": "#/definitions/strlist"}
+        }
+      }
+    },
+    "job_progress": {
+      "type": ["object", "null"],
+      "description": "Only if the troubleshoot report states these values.",
+      "properties": {
+        "scheduled_steps": {"$ref": "#/definitions/nnum"},
+        "completed_steps": {"$ref": "#/definitions/nnum"},
+        "goodput": {"$ref": "#/definitions/nnum"},
+        "lost_time": {"$ref": "#/definitions/nnum"},
+        "primary_barrier": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "google_verdict": {
+      "type": ["object", "null"],
+      "description": "Filled only at the verdict stage from a published Google finding.",
+      "properties": {
+        "subsystem": {"$ref": "#/definitions/nstr"},
+        "corroboration": {"$ref": "#/definitions/nstr"},
+        "resolution": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "storage": {
+      "type": ["object", "null"],
+      "properties": {
+        "checkpoint_bucket": {"$ref": "#/definitions/nstr"},
+        "dataset_bucket": {"$ref": "#/definitions/nstr"},
+        "orbax_barrier_latency_sec": {"$ref": "#/definitions/nnum"}
+      }
+    },
+    "actions_run": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "execution_mode": {"$ref": "#/definitions/nstr"},
+          "inputs": {},
+          "outputs": {}
+        }
+      }
+    },
+    "log_filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filter"],
+        "properties": {
+          "label": {"$ref": "#/definitions/nstr"},
+          "filter": {"type": "string"},
+          "window": {"$ref": "#/definitions/nstr"},
+          "result_count": {"type": ["integer", "string", "null"]}
+        }
+      }
+    },
+    "hypothesis": {
+      "type": ["object", "null"],
+      "properties": {
+        "text": {"$ref": "#/definitions/nstr"},
+        "author": {"$ref": "#/definitions/nstr"},
+        "confidence": {"$ref": "#/definitions/nstr"},
+        "support_refs": {"$ref": "#/definitions/strlist"},
+        "gap_refs": {"$ref": "#/definitions/strlist"},
+        "falsifier": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "questions_for_google": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["c_ref", "question"],
+        "properties": {
+          "id": {"$ref": "#/definitions/nstr"},
+          "c_ref": {"type": "string", "pattern": "^C[0-9]+$"},
+          "owner": {"$ref": "#/definitions/nstr"},
+          "question": {"type": "string"},
+          "if_yes": {"$ref": "#/definitions/nstr"},
+          "if_no": {"$ref": "#/definitions/nstr"}
+        }
+      }
+    },
+    "customer_next_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step"],
+        "properties": {
+          "c_ref": {"$ref": "#/definitions/nstr"},
+          "owner": {"$ref": "#/definitions/nstr"},
+          "step": {"type": "string"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Only files actually uploaded, relative to gs://<bucket>/<storage_key>/.",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {"type": "string"},
+          "kind": {
+            "type": ["string", "null"],
+            "enum": [
+              "logs",
+              "hlo_dump",
+              "mosaic_dump",
+              "xprof",
+              "manifest",
+              "readme",
+              "finding",
+              "failure_table",
+              "workflow_trace",
+              "theory",
+              "baseline",
+              "degraded",
+              "orbax",
+              "memory",
+              "infrastructure",
+              "other",
+              null
+            ]
+          }
+        }
+      }
+    },
+    "system_info": {
+      "type": ["object", "null"],
+      "properties": {
+        "jax_version": {"$ref": "#/definitions/nstr"},
+        "jaxlib_version": {"$ref": "#/definitions/nstr"},
+        "libtpu_version": {"$ref": "#/definitions/nstr"},
+        "python_version": {"$ref": "#/definitions/nstr"},
+        "framework_version": {"$ref": "#/definitions/nstr"},
+        "orbax_version": {"$ref": "#/definitions/nstr"},
+        "environment": {"$ref": "#/definitions/nstr"},
+        "workload_type": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "owners": {
+      "type": ["object", "null"],
+      "properties": {
+        "customer_dri": {"$ref": "#/definitions/nstr"},
+        "customer_primary_investigator": {"$ref": "#/definitions/nstr"},
+        "google_support_lead": {"$ref": "#/definitions/nstr"},
+        "google_ce_lead": {"$ref": "#/definitions/nstr"}
+      }
+    },
+    "discrepancies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field"],
+        "properties": {
+          "field": {"type": "string"},
+          "report_value": {"$ref": "#/definitions/nstr"},
+          "note": {"$ref": "#/definitions/nstr"}
+        }
+      }
+    }
+  }
+}

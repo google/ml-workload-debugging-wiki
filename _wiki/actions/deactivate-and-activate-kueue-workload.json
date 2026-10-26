@@ -1,0 +1,28 @@
+{
+  "title": "Deactivate and Reactivate Kueue Workload",
+  "type": "action",
+  "description": "Last resort: re-admit a stuck GKE Kueue workload (e.g. after preemption) by toggling its spec.active property to false and back to true. Historical mitigation for a known Kueue readmission issue (marked FIXED 2026-04-14). active=false evicts the workload, so run it only when the workload has 0 pods left.",
+  "internal_only": false,
+  "tags": [
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-20",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "Last resort, run by the queue/cluster owner. `spec.active=false` evicts the workload and `spec.active=true` lets Kueue re-admit it at once.\nPreconditions (all must hold):\n1. The workload is stuck in `QuotaReserved` / `Requeued` while capacity is available, and your Kueue version predates the fix (see [[gotchas-kubernetes-gke]], gotcha 6).\n2. It has 0 pods left: `kubectl get pods -n <ns> | grep <jobset-name>` returns nothing (no Terminating pods) and `kubectl get events -n <ns> --field-selector reason=FailedKillPod` is empty. If pods are stuck Terminating, do not kick: a re-admitted TPU slice can be formed on TPUs the old containers still hold. Follow [[kueue-stuck-termination-recovery]] instead.\nThen: `kubectl patch workload ${workload_name} -n <ns> --type=merge -p '{\"spec\":{\"active\":false}}'`, wait about 5 s, and `kubectl patch workload ${workload_name} -n <ns> --type=merge -p '{\"spec\":{\"active\":true}}'`.",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Name of the GKE Kueue workload to re-admit"
+    }
+  }
+}

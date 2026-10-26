@@ -1,0 +1,73 @@
+{
+  "title": "Classify Workload State Across Runs",
+  "type": "action",
+  "description": "Read-only classification of a GKE TPU workload or JobSet series into NEVER_ADMITTED, ADMITTED_NOT_PLACED, PLACED_THEN_CRASHED, MIXED_UNSCHEDULED_AND_CRASHED, HUNG, or WORKLOAD_NOT_FOUND from Kubernetes events and GKE audit logs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "kueue",
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py classify-workload-state --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --start=\"${start}\" --end=\"${end}\" --audit_file=\"${audit_file}\" --events_file=\"${events_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "workload_state",
+    "runs_classified",
+    "admitted_runs",
+    "pending_runs",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC start timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC end timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "audit_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched audit JSON file."
+    },
+    "events_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched events JSON file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/workload_state.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

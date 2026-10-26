@@ -1,0 +1,54 @@
+{
+  "title": "Resolve Workload Infra Specs",
+  "type": "action",
+  "description": "Resolves workload infrastructure specifications (e.g. machine_type, accelerator_type, chips_per_host, topology) using kubectl node metadata, gcloud compute instances describe, gcloud container node-pools describe, or log telemetry fallback.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis",
+    "monitoring",
+    "capacity"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/resolve_workload_infra_specs.py --workload_name=${workload_name} --project_id=${project_id} --cluster_name=${cluster_name} --location=${location} --node_name=${node_name} --node_pool=${node_pool}",
+  "summary_fields": [
+    "machine_type",
+    "accelerator_type",
+    "chips_per_host",
+    "topology",
+    "source",
+    "status"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "default": ""
+    },
+    "project_id": {
+      "type": "string",
+      "default": ""
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": ""
+    },
+    "location": {
+      "type": "string",
+      "default": ""
+    },
+    "node_name": {
+      "type": "string",
+      "default": ""
+    },
+    "node_pool": {
+      "type": "string",
+      "default": ""
+    }
+  }
+}

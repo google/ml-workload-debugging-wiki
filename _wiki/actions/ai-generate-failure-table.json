@@ -1,0 +1,45 @@
+{
+  "title": "AI Generate Failure Table",
+  "type": "action",
+  "description": "Synthesizes diagnostic arrays from hw_analyzer, pod-analyzer, and app_analyzer to categorize disruptions and output a Master Failure Table.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "triage"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "Cross-reference the provided inputs using the `failure-tables.md` logic blocks. Categorize each disruption strictly into one of the 7 `Case` values defined in `concepts/failure-tables.md` (`Monitor for Potential HW Issue`, `Recommend Node Replacement`, `Expected HW Interruption - No Action`, `Expected HW Interruption - Detected repeated bad machine`, `Elastic Upshard`, `Manual Intervention`, or `Unknown Case`). Format as a GitHub-flavored markdown failure table with `Restart Attempt` (e.g., Attempt 0 for initial/absorbed, Attempt 1, Attempt 2, etc.) as the first column (or `Run` in per-run forensics mode, see `playbooks/run-forensics-report-template.md`), followed by Timestamp (UTC), Culprit Pod & Host, Root Signature / Mechanism, Downstream Impact & Failure Mode, Case, and Recovery Outcome. Primary metadata header or explicit column must include: Machine Type / Infra Spec: ${infra_specs}. Parameters -> Workload: ${workload_name}, Machine Type / Infra Spec: ${infra_specs}, Hardware Analysis: ${hw_analysis}, Pod Analysis: ${pod_analysis}, App Analysis: ${app_analysis}.\nNote: If a file path (e.g. `_file`) is provided for inputs like timeline or crash_signatures (e.g. `scratch/*.json`), read directly from the scratch file on disk to avoid context window blowup, rather than expecting a large inline JSON string.\nWhen synthesizing the root cause and executive summary across multi-attempt or multi-run timelines, compute inter-attempt time deltas from the timeline input, highlight large scheduling/timeline gaps (>1000s / >1100s), quote the earliest primary failure per attempt or run, and distinguish repeat-offender hardware (2+ primary incidents on the same instance or node pool) from single-incident or manual interventions.",
+  "summary_fields": [
+    "failure_table",
+    "total_interruptions",
+    "case_breakdown"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target workload name"
+    },
+    "infra_specs": {
+      "type": "string",
+      "description": "Resolved infrastructure specifications including machine_type and accelerator_type"
+    },
+    "hw_analysis": {
+      "type": "string",
+      "description": "Diagnostic array from hardware/VM intervention logs"
+    },
+    "pod_analysis": {
+      "type": "string",
+      "description": "Diagnostic array covering Stage1a and Stage2a scheduling/mount delays"
+    },
+    "app_analysis": {
+      "type": "string",
+      "description": "Diagnostic array capturing fatal application traces (DATA_LOSS, CUDA error, etc.)"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "title": "Workload Disruption Orchestration",
+  "type": "workflow",
+  "description": "Automated multi-layered triangulation timeline workflow. Resolves the complete node scope, sweeps the full window for crash signatures independently of the restart timeline, dispatches concurrent pod, hardware, and application analyzers, names culprit hosts from primary logs, and adversarially verifies every attribution before publishing the failure table.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "pathways",
+    "scheduling",
+    "hardware_fault"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md"
+  ],
+  "created": "2026-07-29",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "validation_state",
+    "node_set_status",
+    "major_timeline_gaps",
+    "repeat_offenders",
+    "master_failure_causes",
+    "verification_verdict"
+  ],
+  "steps": [
+    "[[validate-workload]]",
+    "[[resolve-workload-nodes]]",
+    "[[query-crash-signatures]]",
+    "[[job-disruption-timeline]]",
+    "[[ai-app-analyzer]]",
+    "[[query-vm-termination-events]]",
+    "[[ai-hw-analyzer]]",
+    "[[pod-analyzer]]",
+    "[[extract-culprit-hosts]]",
+    "[[resolve-workload-infra-specs]]",
+    "[[ai-generate-failure-table]]",
+    "[[ai-verify-failure-attribution]]"
+  ],
+  "step_notes": {
+    "resolve-workload-nodes": "Must run before [[ai-hw-analyzer]] and downstream queries. Its emitted node_name_filter_clause and node_filter_clause enable concurrent scoping. An unsliced node query truncates at its entry cap; a partial node set silently narrows every downstream hardware verdict.",
+    "query-crash-signatures": "Runs over the FULL window in a single consolidated pass, extracting all restart-attempt labels in memory. Agents must perform a single window query and group/analyze restart attempts in-memory rather than issuing serial per-attempt network calls. Restart-derived timelines cannot see disruptions the workload recovered from, and those are often the most informative events.",
+    "job-disruption-timeline": "Treat the attempt list as a NOISY DRAFT, not ground truth. It double-counts Pod Name Change / In-Place Restart records at identical timestamps and classifies successful termination as a restart. When an operator requests the latest N restart attempts or during multi-attempt triage, dynamically discover all distinct attempt indices across the unclipped workload lifespan rather than assuming a static count, and select the latest N attempts in reverse chronological order. Reconcile it against the single-pass crash sweep before use.",
+    "extract-culprit-hosts": "Authoritative attribution. Culprit hosts are quoted from Pathways own log lines; never inferred from DATA_LOSS device coordinates, which show where the symptom surfaced rather than which host died.",
+    "resolve-workload-infra-specs": "Extracts machine_type, accelerator_type, chips_per_host, and topology using kubectl node metadata, gcloud compute instances describe, gcloud container node-pools describe, or log telemetry fallback. Supplies infra_specs to ai-generate-failure-table.",
+    "ai-generate-failure-table": "Synthesizes the reconciled disruption analysis and resolved infra_specs into the Master Failure Table, formatting 'Restart Attempt' as the first column (e.g. Attempt 0 for initial/absorbed, Attempt 1, Attempt 2, etc.), followed by timestamp, culprit pod & host, root signature, downstream impact, failure domain, and recovery outcome, including Machine Type / Infra Spec in primary metadata or column headers.",
+    "ai-verify-failure-attribution": "Gate. The failure table is not published until this returns APPROVED.",
+    "query-vm-termination-events": "Deterministic, node-scoped audit-log query. Must be passed the node_filter_clause emitted by [[resolve-workload-nodes]]. Split out of [[ai-hw-analyzer]] so the query is reproducible and always scoped; an unscoped audit query returns other workloads' preemptions and invites a false preemption verdict.",
+    "ai-hw-analyzer": "Interprets the output of [[query-vm-termination-events]] plus in-node evidence. Must return a SCOPED verdict naming what was checked, never a bare 'No VM Termination'."
+  },
+  "step_fallbacks": {
+    "resolve-workload-infra-specs": [
+      {
+        "when": [
+          "access_denied",
+          "empty_result",
+          "command_error"
+        ],
+        "replace_with": [
+          "[[resolve-cluster-metadata]]"
+        ],
+        "reason": "Fallback to cluster metadata resolution when direct node/instance infra spec queries fail or return empty."
+      }
+    ]
+  }
+}

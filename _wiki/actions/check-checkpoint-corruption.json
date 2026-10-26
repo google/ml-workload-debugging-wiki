@@ -1,0 +1,48 @@
+{
+  "title": "Check Checkpoint Corruption",
+  "type": "action",
+  "description": "Check for checkpoint corruption-induced hangs causing 'Jax Process 0 != McJax Coordinator Slice 0' on startup restarts.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "hangs"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --limit=${limit} --workload_name=${workload_name} --project_id=${project_id} --start=${start} --end=${end} --output_file=${output_file} --filter_extra=\"\\\"Jax Process 0 != McJax Coordinator Slice 0\\\"\"",
+  "summary_fields": [
+    "original_count",
+    "deduplicated_count",
+    "error_fatal_count",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Destination for matched entries. Required: the script writes results here, not to stdout."
+    },
+    "start": {
+      "type": "string",
+      "description": "RFC3339 start of the run window. Required to reach a historical incident: without it gcloud falls back to a 1-day freshness default and returns nothing."
+    },
+    "end": {
+      "type": "string",
+      "description": "RFC3339 end of the run window."
+    }
+  }
+}

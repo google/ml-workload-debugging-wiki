@@ -1,0 +1,36 @@
+{
+  "title": "Map Physical ID to GKE Instance",
+  "type": "action",
+  "description": "Map physical TPU ID to GKE instance name from logs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'jsonPayload.message:\"${physical_id}\" AND \"Driver opened\"' --project ${project_id} --limit 5 --freshness=${freshness}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "physical_id": {
+      "type": "string",
+      "description": "e.g. tpu740"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}

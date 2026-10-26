@@ -1,0 +1,79 @@
+{
+  "title": "Configure and Launch Dashboard",
+  "type": "action",
+  "description": "Configures GKE cluster monitoring in the dashboard, verifies the local server daemon (reporting UNRESPONSIVE when a hung server holds the port), triggers a live scan, and generates a deep-linked URL scoped to the target workload. The URL is verified before it is returned: an unresolvable hostname falls back to localhost, and a server that stalls during the scan yields status FAILED with a remediation hint.",
+  "internal_only": false,
+  "tags": [
+    "monitoring",
+    "triage",
+    "capacity"
+  ],
+  "created": "2026-09-16",
+  "updated": "2026-09-25",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/configure_and_launch_dashboard.py --cluster '${cluster_name}' --project '${project_id}' --location '${location}' --workload '${workload_name}' --generation '${generation}' --reservation '${reservation}' --start '${start_timestamp}' --end '${end_timestamp}' --lookback-days ${lookback_days} --port ${port} --host '${host}'",
+  "summary_fields": [
+    "dashboard_url",
+    "url_status",
+    "url_probes",
+    "url_error",
+    "url_hint",
+    "cluster_name",
+    "project_id",
+    "generation",
+    "reservation",
+    "server_status",
+    "status",
+    "workload_name"
+  ],
+  "parameters": {
+    "cluster_name": {
+      "type": "string",
+      "default": ""
+    },
+    "project_id": {
+      "type": "string",
+      "default": ""
+    },
+    "location": {
+      "type": "string",
+      "default": "us-central1"
+    },
+    "workload_name": {
+      "type": "string",
+      "default": ""
+    },
+    "generation": {
+      "type": "string",
+      "default": ""
+    },
+    "reservation": {
+      "type": "string",
+      "default": ""
+    },
+    "start_timestamp": {
+      "type": "string",
+      "default": ""
+    },
+    "end_timestamp": {
+      "type": "string",
+      "default": ""
+    },
+    "lookback_days": {
+      "type": "integer",
+      "default": 30
+    },
+    "port": {
+      "type": "integer",
+      "default": 8080
+    },
+    "host": {
+      "type": "string",
+      "default": "0.0.0.0"
+    }
+  }
+}

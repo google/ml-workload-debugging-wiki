@@ -1,0 +1,53 @@
+{
+  "title": "Package Handoff Artifacts",
+  "type": "action",
+  "description": "Collects diagnostic scratch artifacts, sanitizes HLO dumps, and uploads them into canonical handoff paths (upload is on by default). Artifacts with no source are listed in missing_artifacts instead of being written as placeholder files; exits non-zero on any upload failure.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "analysis"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-04",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/package_handoff_artifacts.py --findings=${findings} $([ -n \"${bucket}\" ] && echo \"--bucket=${bucket}\") $([ -n \"${workload}\" ] && echo \"--workload=${workload}\") $([ -n \"${triage_json}\" ] && echo \"--triage_json=${triage_json}\") $([ -n \"${staging_dir}\" ] && echo \"--staging_dir=${staging_dir}\") $([ \"${upload}\" = \"false\" -o \"${upload}\" = \"False\" ] && echo \"--no_upload\")",
+  "summary_fields": [
+    "status",
+    "workload",
+    "bucket",
+    "staged_count",
+    "missing_artifacts"
+  ],
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name"
+    },
+    "workload": {
+      "type": "string",
+      "description": "Target workload name (used for scratch triage discovery)"
+    },
+    "triage_json": {
+      "type": "string",
+      "description": "Path to /troubleshoot triage state JSON file"
+    },
+    "staging_dir": {
+      "type": "string",
+      "default": "",
+      "description": "Optional local staging directory"
+    },
+    "upload": {
+      "type": "boolean",
+      "default": true,
+      "description": "Upload staged artifacts to GCS (default true; false stages locally only)"
+    }
+  }
+}

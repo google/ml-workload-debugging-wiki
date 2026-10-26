@@ -1,0 +1,26 @@
+{
+  "title": "Shared Cluster Usage Instructions",
+  "type": "workflow",
+  "description": "Audit Kueue capacity and shared cluster queue usage to diagnose scheduling delays or resource starvation.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[connect-to-cluster]]",
+    "[[get-slices]]",
+    "[[get-cluster-queues]]"
+  ]
+}

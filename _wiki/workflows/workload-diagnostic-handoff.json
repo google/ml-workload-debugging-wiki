@@ -1,0 +1,57 @@
+{
+  "title": "Workload Diagnostic Handoff",
+  "type": "workflow",
+  "description": "End-to-end diagnostic handoff workflow that executes /troubleshoot to gather findings, verifies destination bucket access, converts triage state, scaffolds GCS repositories, generates manifests and Two-Level Failure Tables, sanitizes payloads, publishes the package and verifies the bucket holds real content, stages partner issue updates, and arms automated background monitoring.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "analysis",
+    "approval"
+  ],
+  "sources": [
+    "playbooks/workload-diagnostic-handoff.md",
+    "concepts/failure-tables.md"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-05",
+  "entrypoints": [
+    "handoff",
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "storage_key",
+    "bucket",
+    "workload",
+    "manifest_status",
+    "failure_table_status",
+    "package_verify_status",
+    "bucket_monitor_status"
+  ],
+  "steps": [
+    "[[workload-disruption-orchestration]]",
+    "[[verify-handoff-bucket-access]]",
+    "[[convert-triage-to-findings]]",
+    "[[scaffold-handoff-bucket]]",
+    "[[package-handoff-artifacts]]",
+    "[[generate-handoff-manifests]]",
+    "[[generate-two-level-failure-tables]]",
+    "[[render-handoff-readmes]]",
+    "[[upload-handoff-package]]",
+    "[[verify-handoff-package]]",
+    "[[post-partner-issue-comment]]"
+  ],
+  "step_notes": {
+    "workload-disruption-orchestration": "Executes /troubleshoot on the target workload to investigate disruption signals, quote culprit hosts from primary logs, resolve complete node scope, and emit the triage state JSON and failure table.",
+    "verify-handoff-bucket-access": "Pre-flight security prober. Verifies write/read capability and ensures publicAccessPrevention: enforced on the target bucket.",
+    "convert-triage-to-findings": "Transforms raw triage state JSON from /troubleshoot into canonical troubleshoot_findings.json adhering to Schema v2.2.",
+    "scaffold-handoff-bucket": "Provisions the multi-job incident structure at gs://<bucket>/<storage_key>/ (BUCKET_STRUCTURE.md, support case link). Never pre-creates empty directory markers (.keep), manifests, READMEs or failure tables; directories in GCS are created on-demand as real files are uploaded.",
+    "package-handoff-artifacts": "Gathers scratch logs and traces, invokes redact_diagnostic_payload.py on HLO graphs, and uploads them under jobs/<workload>/data/ (upload on by default). Artifacts with no source are reported in missing_artifacts, never written as placeholders; any upload failure exits non-zero.",
+    "generate-handoff-manifests": "Emits INCIDENT_MANIFEST.json and JOB_MANIFEST.json with null-propagation for unverified fields into the shared staging --output_dir. Fails on findings validation errors or a missing bucket.",
+    "generate-two-level-failure-tables": "Synthesizes Level A Infrastructure Failure Table (initialized to PENDING_GOOGLE_CORRELATION) and Level B Job Progression Master Disruption Table into the same staging --output_dir.",
+    "render-handoff-readmes": "Renders INCIDENT_OVERVIEW.md, README.md, jobs/<workload>/JOB_README.md and jobs/<workload>/README.md in strict 7-bit ASCII into the same staging --output_dir.",
+    "post-partner-issue-comment": "Renders the update for the Partner Issue Tracker and prints the issue link for the operator to paste. requires_approval; runs only after verify-handoff-package returns VERIFIED.",
+    "upload-handoff-package": "Uploads the staging tree to gs://<bucket>/<storage_key>/. All-or-nothing: refuses if a required file is missing or any file is empty, placeholder-only, or invalid JSON.",
+    "verify-handoff-package": "Lists the published bucket and must return VERIFIED before the partner issue comment is staged or monitoring is armed. INCOMPLETE or VERIFY_FAILED stops the handoff."
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "title": "AI Verify Failure Attribution",
+  "type": "action",
+  "description": "Adversarial verification pass over a drafted failure table. Re-derives every culprit attribution from primary logs and flags any claim that was inferred rather than quoted, before the table is published.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "triage"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md",
+    "playbooks/run-forensics-report-template.md",
+    "concepts/failure-tables.md"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "You are adversarially verifying a drafted failure table or multi-run forensics report for `${workload_name}` in project `${project_id}` BEFORE it is published. Assume it contains at least one wrong attribution and try to find it.\n\nDrafted table:\n${failure_table}\n\nExplicitly-named culprit hosts: ${culprit_hosts_json}\nResolved node set: ${node_set_json}\n\nCheck each of the following and report PASS or FAIL with evidence:\n\n1. **Quoted, not inferred.** For every culprit host or pod named in the table, find the log line that names it literally. A host derived from DATA_LOSS device coordinates (e.g. `device(272,...,slice=1)`) is NOT acceptable evidence — device coords show where the symptom surfaced, which is frequently a different slice from the host that died. Cross-check every attribution against the explicitly-named culprit hosts above. FAIL and give the correct host if they disagree.\n\n2. **Scope completeness.** Confirm the node set status is COMPLETE. If it is INCOMPLETE, any 'no hardware event' style verdict must be re-scoped or downgraded to inconclusive. FAIL if a fleet-wide negative was asserted over a partial node set.\n\n3. **First cause, not first symptom.** For each failure, verify the chain starts at the earliest process death (crash signal, pipe break, host loss) and not at the first error the client happened to report. Client-side `DATA_LOSS` / `ValueError` are almost always downstream. FAIL if a chain begins mid-cascade.\n\n4. **Preemption claims.** Any claim of preemption must be corroborated by a GCE audit event for one of this workload's own nodes. `EXIT_TYPE_QUICKLY_DURING_PREEMPTION`, `\"Resource manager is being preempted\"`, and `\"Received SIGTERM ... forwarding as a preemption notification\"` are emitted for ANY SIGTERM and are NOT evidence of preemption. Verify the ordering: if the application process exited before kubelet sent SIGTERM, the preemption wording is an artifact. FAIL if an uncorroborated preemption claim is present.\n\n5. **Repeat offenders.** Recount **primary incidents** per instance id -- not raw events and not cascade reports: one host death is reported by every surviving peer, so counting events inflates a single failure into a dozen and nominates healthy nodes. Two or more distinct primary incidents on the same instance requires `Recommend Node Replacement`, not `Monitor for Potential HW Issue`. FAIL if under-classified, and FAIL if the count came from raw events.\n\n6. **Recovered events counted.** Confirm disruptions the workload recovered from WITHOUT a restart are present in the table. These are missing from restart-derived timelines yet are highly informative: they prove the fault is survivable and reclassify failed recoveries as recovery-path defects. FAIL if the crash sweep shows a crash with no corresponding table row.\n\n7. **Retracted claims.** Flag any assertion resting on a truncated command output (e.g. a listing piped through `head`) that was not re-verified unbounded.\n\n8. **Grounded recommendations.** Every recommendation must either cite the wiki action, workflow, or page that backs it, or be explicitly labelled as unsupported operator judgement. Check that a cited action actually applies to THIS platform: a GKE workload needs `isolate-node-via-rr-label` / `node-isolation-and-rr-api`. FAIL a recommendation that cites a wrong-platform action, and FAIL an unlabelled recommendation with no wiki backing. Also flag *circular* grounding: a citation to a page whose `sources: []` and creation date show it was written from this same incident is not independent corroboration, and should be marked as a single-incident finding.\n\n9. **Run scope stated on every claim.** In a multi-run report, every claim (excluded node pools, placement, pending TAS reason, crash signature) must name the exact run(s) it applies to. FAIL if one run's `NotIn` exclusion list or placement was inferred from a sibling run instead of recovered per run from `io.k8s.batch.v1.jobs.create` audit entries.\n\n10. **Time-aligned evidence.** FAIL if a live cluster snapshot (`kubectl get nodes` or `kubectl get pods` taken after the incident) is used to explain a historical scheduling shortfall or crash state instead of audit logs and events from the run's own timestamp window.\n\n11. **Full cube ledger accounting.** When a run failed to schedule (`allows to fit only N out of M slice(s)`), verify that every cube is accounted for in the per-run ledger (`usable_cubes - degraded_if_pinned_healthy - self_excluded_pools - held_by_other_queues = free_cubes_for_run`). FAIL if the report blames a generic cluster-wide 'not enough healthy cubes' count without decoding the job's own `affinity` and `resource` buckets.\n\n12. **'Would the remediation help?' math check.** Verify that any recommendation to reclaim/evict another workload or trim `NotIn` exclusions includes the arithmetic showing that `free_cubes_for_run >= needed_cubes` after the change. FAIL if a recommended eviction or exclusion change still leaves the job short.\n\n13. **No unapproved mutation.** Confirm that no mutating cluster or cloud command (node taints, cordons, pod deletes, patches, debug pods, or labels) was run during triage without explicit user approval, and that any cluster-changing recommendation explicitly states `requires_approval` ('Ask the user before running').\n\n## Inference rules you must not break\n\nThese are recorded because a previous run of this action failed a correct table on all three counts:\n\n- **A pod is not the process inside it.** A worker killed by a signal does NOT stop the pod from logging: the container often survives or restarts, and later log lines from that pod do not refute the death. Never treat \"this pod logged after its stated death time\" as evidence the attribution is wrong.\n- **A pod naming its own host as a lost peer is normal.** Pathways addresses workers as `http://machine/<node>`, and a co-located process can report losing that peer. Do not use it to argue the pod is resident elsewhere.\n- **Absence from a reporter corpus is evidence of being the victim, not of fabrication.** The dead worker is precisely the one that stops reporting. If a pod named in the table never appears as a `reporting_pod`, that is consistent with it being the victim; check pod->node residency in `k8s_node` logs before alleging the attribution was invented.\n- **One extractor's output is not the complete log record.** `extract-culprit-hosts` collects only `lost connection to peer` lines. \"Not present in that corpus\" does not mean \"did not happen\"; a claim about a different message type must be checked against a query for that message type.\n\nReturn a markdown report: a PASS/FAIL line per check (checks 1-13), every correction with the log line that proves it, and a final verdict of APPROVED or REVISION REQUIRED.\nNote: If a file path (e.g. `_file`) is provided for inputs like timeline or crash_signatures (e.g. `scratch/*.json`), read directly from the scratch file on disk to avoid context window blowup, rather than expecting a large inline JSON string.",
+  "summary_fields": [
+    "verdict",
+    "checks_passed",
+    "checks_failed",
+    "corrections"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target workload name"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project where workload lives"
+    },
+    "failure_table": {
+      "type": "string",
+      "description": "The drafted Master Failure Table to verify"
+    },
+    "culprit_hosts_json": {
+      "type": "string",
+      "description": "Output of [[extract-culprit-hosts]]"
+    },
+    "node_set_json": {
+      "type": "string",
+      "description": "Output of [[resolve-workload-nodes]]"
+    },
+    "culprit_hosts_file": {
+      "type": "string",
+      "description": "Path to a file containing culprit_hosts. Preferred over inline json to avoid context blowup."
+    }
+  }
+}

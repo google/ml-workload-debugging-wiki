@@ -1,0 +1,15 @@
+{
+  "enforce-wiki-boundary": {
+    "PreToolUse": [
+      {
+        "matcher": "view_file|list_dir|write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 _agents/scripts/boundary_gate.py"
+          }
+        ]
+      }
+    ]
+  }
+}

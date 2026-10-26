@@ -1,0 +1,26 @@
+{
+  "title": "Lookup Project Number",
+  "type": "action",
+  "description": "Resolve a GCP project ID to its numeric project number using gcloud projects describe.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-09-18",
+  "updated": "2026-09-18",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud projects describe ${project_id} --format=\"value(projectNumber)\"",
+  "summary_fields": [
+    "project_number"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID to resolve to project number."
+    }
+  }
+}

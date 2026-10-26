@@ -1,0 +1,49 @@
+{
+  "title": "Query GCE System Events by Zone",
+  "type": "action",
+  "description": "Read-only, cluster-wide GCE system-event timeline: every Compute Engine `system_event` audit-log entry in ONE zone of the project since `start`, written as a JSON array to `output_file`. Methods of interest (`protoPayload.methodName`): `compute.instances.hostError`, `restartInPlaceAttempting`, `successfulRestartInPlace`, `automaticRestart`, `terminateOnHostMaintenance`, `upcomingMaintenance`, `repair.recreateInstance`, and sub-block group maintenance (`compute.reservations.subBlock.start/completedGroupMaintenance`). Key entries by `resource.labels.instance_id` and `timestamp`; the metadata carries maintenance windows and reasons, and `instance_group_manager_name` identifies the node pool. Scope is zone + time only, NOT workload-scoped: it returns the events of every VM in the zone, including other workloads' VMs. To attribute events to one workload's nodes use the node-scoped [[query-vm-termination-events]] instead. Truncation: entries come back newest-first (the gcloud logging read default; this instruction sets no --order), so a read that hits `limit` loses the OLDEST entries of the window, and any outage or strike counts built from it are then lower bounds: raise `limit` or shorten the window and re-run. timeout_seconds is 300 because a 14 d project-wide read took ~77 s in the source (a 2 h window is much faster).",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "logging",
+    "triage"
+  ],
+  "created": "2026-09-29",
+  "updated": "2026-09-29",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'logName=\"projects/${project_id}/logs/cloudaudit.googleapis.com%2Fsystem_event\" AND resource.labels.zone=\"${zone}\" AND timestamp>=\"${start}\"' --project=${project_id} --format=json --limit=${limit} > ${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "timeout_seconds": 300,
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID (used in the logName and in --project)."
+    },
+    "zone": {
+      "type": "string",
+      "description": "Zone to scope to. Mandatory: a project can hold TPU capacity in several zones."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start, UTC RFC3339 (e.g. 2026-09-29T05:00:00Z). About 2 h before now for the hourly timeline; up to 14 d before now to backfill the flapping history (the flapping heuristics look back at most 14 d)."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 50000,
+      "description": "Maximum entries returned. If the number of entries in output_file equals this value the read was truncated and, since entries are newest-first, the oldest part of the window is missing: raise the limit or shorten the window (later start) and re-run before concluding that an event is absent."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/gce_system_events.json",
+      "description": "Where the JSON array of log entries is written (relative to the wiki root)."
+    }
+  }
+}

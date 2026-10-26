@@ -1,0 +1,48 @@
+{
+  "title": "Render Handoff READMEs",
+  "type": "action",
+  "description": "Renders incident overviews, root READMEs, and job context markdown files from templates adhering to strict ASCII standards.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis",
+    "storage"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/render_readme.py --findings=${findings}$([ -n \"${mode}\" ] && echo \" --mode=${mode}\")$([ -n \"${output_file}\" ] && echo \" --output_file=${output_file}\")$([ -n \"${output_dir}\" ] && echo \" --output_dir=${output_dir}\")$([ -n \"${bucket}\" ] && echo \" --bucket=${bucket}\")",
+  "summary_fields": [
+    "status",
+    "output_file"
+  ],
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "mode": {
+      "type": "string",
+      "default": "job",
+      "description": "Render mode: incident, job, or readme"
+    },
+    "output_file": {
+      "type": "string",
+      "default": "",
+      "description": "Destination markdown file path"
+    },
+    "output_dir": {
+      "type": "string",
+      "default": "",
+      "description": "Destination directory for generated readmes"
+    },
+    "bucket": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GCS bucket override"
+    }
+  }
+}

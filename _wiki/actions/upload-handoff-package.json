@@ -1,0 +1,44 @@
+{
+  "title": "Upload Handoff Package",
+  "type": "action",
+  "description": "Publishes the rendered handoff package (manifests, failure tables, READMEs) from the local staging tree to gs://<bucket>/<storage_key>/. All-or-nothing: refuses to upload anything if a required file is missing or any staged file is empty, placeholder-only, or invalid JSON.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "gcp"
+  ],
+  "created": "2026-10-04",
+  "updated": "2026-10-04",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/upload_handoff_package.py --findings=${findings} --staging_dir=${staging_dir}$([ -n \"${bucket}\" ] && echo \" --bucket=${bucket}\")$([ \"${dry_run}\" = \"true\" -o \"${dry_run}\" = \"True\" ] && echo \" --dry_run\")",
+  "summary_fields": [
+    "status",
+    "storage_root",
+    "uploaded_count",
+    "problem_count"
+  ],
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "staging_dir": {
+      "type": "string",
+      "description": "Local package tree: the shared --output_dir given to generate-handoff-manifests, generate-two-level-failure-tables and render-handoff-readmes"
+    },
+    "bucket": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GCS bucket override (else identity.bucket or $HANDOFF_BUCKET; no default)"
+    },
+    "dry_run": {
+      "type": "boolean",
+      "default": false,
+      "description": "Print the gcloud copy commands without uploading"
+    }
+  }
+}

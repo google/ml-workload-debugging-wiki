@@ -1,0 +1,32 @@
+{
+  "title": "Check Node DNS Resolv Config",
+  "type": "action",
+  "description": "Inspect /etc/resolv.conf on GKE node and pod instances to verify metadata server configuration and check for custom DNS overrides.",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-07-23",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl exec -it ${pod_name} -n ${namespace} -- cat /etc/resolv.conf",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "pod_name": {
+      "type": "string",
+      "description": "Target pod name to inspect resolv.conf."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Namespace of the target pod."
+    }
+  }
+}

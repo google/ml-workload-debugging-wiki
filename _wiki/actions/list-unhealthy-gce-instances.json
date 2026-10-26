@@ -1,0 +1,51 @@
+{
+  "title": "List Unhealthy GCE Instances",
+  "type": "action",
+  "description": "Read-only JSON list of the VMs in one zone of the project that are not RUNNING (e.g. REPAIRING, STAGING, TERMINATED) or that carry an upcomingMaintenance notice. Fields: `name`, `id` (the same value as the node annotation `container.googleapis.com/instance_id`), `status`, `creationTimestamp` and `resourceStatus.upcomingMaintenance{maintenanceStatus, type, windowStartTime}`. Covers every VM of the project in that zone, not only one workload's nodes. Run it asynchronously and at most every 5 min. timeout_seconds is 180 because the source measured ~48 s for this filtered list (~75 s for a full list). A FAILURE_INFRA maintenance window that keeps reopening while the VM stays RUNNING is a stale notice: the host has a known fault and may be taken down at any time.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "ironwood",
+    "hardware_fault",
+    "triage"
+  ],
+  "created": "2026-09-29",
+  "updated": "2026-10-07",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud compute instances list --quiet --project=${project_id} --filter=\"zone:(${zone}) AND (status!=RUNNING OR resourceStatus.upcomingMaintenance:*)\" --format=\"json(name,id,status,creationTimestamp,resourceStatus.upcomingMaintenance)\"",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "timeout_seconds": 60,
+  "fallback": [
+    {
+      "action": "[[query-gce-system-events-by-zone]]",
+      "when": [
+        "access_denied",
+        "timeout"
+      ],
+      "param_mapping": {
+        "project_id": "${project_id}",
+        "zone": "${zone}"
+      },
+      "reason": "Query Cloud Logging GCE system_event audit logs by zone when compute.instances.list is denied or times out.",
+      "internal_only": false,
+      "auto_execute": false
+    }
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "zone": {
+      "type": "string",
+      "description": "Zone to list. A project can hold TPU capacity in several zones; run once per zone."
+    }
+  }
+}

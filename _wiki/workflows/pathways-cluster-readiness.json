@@ -1,0 +1,26 @@
+{
+  "title": "Verifying Pathways Cluster Readiness",
+  "type": "workflow",
+  "description": "Verify Pathways cluster readiness by checking Resource Manager (RM) and IFRT Proxy startup and connection status.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-rm-readiness]]",
+    "[[check-proxy-readiness]]"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "title": "Enable CoreDNS and NodeLocalDNS",
+  "type": "action",
+  "description": "Enable the NodeLocal DNSCache addon on a GKE cluster to relieve high-concurrency DNS lookup bottlenecks. Run by the cluster admin: on an existing cluster this recreates the nodes (kills running workloads), so drain or schedule it first. The CoreDNS engine is not switched by this command (see kubedns-troubleshooting).",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage",
+    "tpu"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-10-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud container clusters update ${cluster_name} --update-addons=NodeLocalDNS=ENABLED --project ${project_id} --location ${location}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "cluster_name": {
+      "type": "string",
+      "description": "Name of the GKE cluster."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "location": {
+      "type": "string",
+      "description": "GCP location (region or zone) of the cluster."
+    }
+  }
+}

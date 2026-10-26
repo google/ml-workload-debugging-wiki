@@ -1,0 +1,36 @@
+{
+  "title": "Connect to Cluster",
+  "type": "action",
+  "description": "Connect to GKE cluster using gcloud. (Note: --dns-endpoint may be required sometimes)",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "auth"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-25",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud container clusters get-credentials ${cluster_name} --region ${region} --project ${project_id} --dns-endpoint",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "cluster_name": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string",
+      "default": "us-central1"
+    },
+    "project_id": {
+      "type": "string",
+      "default": "[GCP_PROJECT_ID]"
+    }
+  }
+}

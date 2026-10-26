@@ -1,0 +1,76 @@
+{
+  "title": "Decode Kueue TAS Pending Message History",
+  "type": "action",
+  "description": "Read-only decoder for Kueue Topology-Aware Scheduling ('allows to fit only N out of M slice(s) ... excluded: affinity A, resource R, taint T') and quota messages in ascending timestamp order, converting each excluded node bucket into 4x4x4 cubes and detecting two-pass quota masking.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "kueue",
+    "scheduling",
+    "capacity",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py decode-tas-message --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --start=\"${start}\" --end=\"${end}\" --nodes_per_cube=${nodes_per_cube} --events_file=\"${events_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "fit_slices",
+    "needed_slices",
+    "excluded_affinity_cubes",
+    "excluded_resource_cubes",
+    "excluded_taint_nodes",
+    "two_pass_quota_masking",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC start timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC end timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "nodes_per_cube": {
+      "type": "integer",
+      "default": 16,
+      "description": "Nodes per 4x4x4 TPU7x cube (default 16)."
+    },
+    "events_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched events JSON file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/tas_decoded.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

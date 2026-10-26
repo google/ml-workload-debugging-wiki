@@ -1,0 +1,39 @@
+{
+  "title": "Mask Log Segment",
+  "type": "action",
+  "description": "Masks raw log strings or JSON segments using mask_segment_tool.py to parameterize variable identifiers and deduplicate repetitive log lines into a concise set of unique templates.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "methodology"
+  ],
+  "created": "2026-07-05",
+  "updated": "2026-07-24",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/mask_segment_tool.py ${input_file} --format=${format} --output-format=${output_format}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "parameters": {
+    "input_file": {
+      "type": "string",
+      "description": "Input file path (reads from stdin if empty or piped)",
+      "default": ""
+    },
+    "format": {
+      "type": "string",
+      "description": "Input format ('text', 'json', 'auto')",
+      "default": "auto"
+    },
+    "output_format": {
+      "type": "string",
+      "description": "Output format ('text', 'json')",
+      "default": "json"
+    }
+  }
+}

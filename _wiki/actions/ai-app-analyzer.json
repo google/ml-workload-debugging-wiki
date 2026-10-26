@@ -1,0 +1,50 @@
+{
+  "title": "App Analyzer",
+  "type": "action",
+  "description": "Scans live application logs across the FULL window bounding each interruption to trace the first process death and any fatal runtime exceptions. Deliberately not limited to a fixed pre-crash window: the death that causes an exit frequently precedes it by many minutes.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "triage"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "ai",
+  "instruction": "ai-action",
+  "prompt": "Trace the first process death and any fatal runtime exceptions for workload `${workload_name}` in project `${project_id}`.\n\nTimeline of restart attempts: ${timeline_json}\nFull-window crash signatures: ${crash_signatures_json}\n\n1. **Window sizing — do NOT use a fixed 2-minute lookback.** For each attempt, scan the ENTIRE gap `[previous_attempt_timestamp, timestamp]`. A fixed short window is a known source of missed root causes: in a real multi-slice incident the worker kill that caused an exit at 09:10:29 occurred at 09:00:26, 9m54s earlier, and would have been invisible to a 2-minute window. If a gap exceeds 30 minutes, scan the 30 minutes before the exit plus the 5 minutes after the previous attempt, and say so.\n2. **Find the first process death, not the first reported error.** Order candidate events by timestamp and start the chain at the earliest of: a crash signal (`received by PID`, `FailureSignalHandler`), a pipe break (`lost connection to peer`), or a host loss. Client-side `DATA_LOSS`, `PlacementDataLoss`, and Python `ValueError`/`JaxRuntimeError` are almost always DOWNSTREAM consequences — never begin a chain there.\n3. **Signal semantics.** For any crash signal, read `si_code`. `si_code=0` is SI_USER, meaning the signal was delivered via `kill()` by another process rather than raised by the CPU — report it as an external kill and, if identifiable, name the sender. `si_code=-6` with `from PID <self>` is a self-`abort()`, i.e. coordinated teardown, not an independent fault; do not count it as a separate failure.\n4. **Live logs only.** Query via `tools/scripts/pull_and_format_logs.py` or a direct Cloud Logging query. No mocks.\n5. **Attribute carefully.** The pod that logs an error is often not the culprit. Report the first pod to report AND the pod that actually died, and keep them distinct.\n6. **Include recovered events.** Report crashes the workload survived WITHOUT restarting. They are absent from restart-derived timelines but prove the fault is survivable, which reclassifies failed recoveries as recovery-path defects rather than inevitable outcomes.\n\nReturn a per-event array with: timestamp, event type, pod, node (if named), the key error string quoted verbatim, whether the workload recovered, and whether this event is a root cause or a downstream consequence.\nNote: If a file path (e.g. `_file`) is provided for inputs like timeline or crash_signatures (e.g. `scratch/*.json`), read directly from the scratch file on disk to avoid context window blowup, rather than expecting a large inline JSON string.",
+  "summary_fields": [
+    "root_cause_events",
+    "downstream_events",
+    "recovered_events",
+    "culprit_pods"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target workload name"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Project where workload lives"
+    },
+    "timeline_json": {
+      "type": "string",
+      "description": "Chronological array of restart attempts and timestamps"
+    },
+    "crash_signatures_json": {
+      "type": "string",
+      "description": "Output of [[query-crash-signatures]] (full-window, timeline-independent)"
+    },
+    "timeline_file": {
+      "type": "string",
+      "description": "Path to a file containing the timeline (e.g. scratch/timeline.json). Preferred over timeline_json to avoid context window blowup."
+    },
+    "crash_signatures_file": {
+      "type": "string",
+      "description": "Path to a file containing the crash signatures (e.g. scratch/crashes.json). Preferred over crash_signatures_json."
+    }
+  }
+}

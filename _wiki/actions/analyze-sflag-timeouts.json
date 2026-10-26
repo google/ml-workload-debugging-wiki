@@ -1,0 +1,36 @@
+{
+  "title": "Analyze sflag Timeouts",
+  "type": "action",
+  "description": "[Verify Command] Retrieve and aggregate TensorCore sflag timeouts, SparseCore sflag timeouts, and SparseCore sequencer halts to identify stragglers and outlier PCs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "LOGS=$(gcloud logging read 'resource.labels.pod_name:\"${workload_name}-\" AND (\"Wait timeout on sflag\" OR \"Sflag wait timeout\" OR \"halted unexpectedly\" OR \"halted prematurely\")' --project ${project_id} --order=ASC --format=\"value(jsonPayload.message)\"); echo \"=== TensorCore sflag timeouts ===\"; echo \"$LOGS\" --freshness=${freshness} | grep \"Wait timeout on sflag\" | grep -o \"hlo: [^ ]*\" | sort | uniq -c; echo \"=== SparseCore sflag timeouts ===\"; echo \"$LOGS\" | grep \"Sflag wait timeout\" | grep -o \"op: [^ ]*\" | sort | uniq -c; echo \"=== SparseCore halts ===\"; echo \"$LOGS\" | grep -o \"tag:pc [^ ]*\" | sort | uniq -c",
+  "summary_fields": [
+    "matched_symptoms_count",
+    "primary_severity",
+    "classification_output",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "freshness": {
+      "type": "string",
+      "default": "180d",
+      "description": "gcloud log-read window. gcloud defaults to 1 day and returns an empty set with exit 0 for anything older, which reads as a real negative. Widen this to reach a historical incident."
+    }
+  }
+}

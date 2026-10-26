@@ -1,0 +1,28 @@
+{
+  "title": "Remediate KubeDNS Resolution Failure",
+  "type": "workflow",
+  "description": "Remediation workflow for resolving KubeDNS resolution timeouts and Kueue slice acquisition failures in multi-slice TPU clusters.",
+  "internal_only": false,
+  "tags": [
+    "timeout",
+    "triage",
+    "tpu"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-07-23",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-node-dns-resolv]]",
+    "[[query-kubedns-logs]]",
+    "[[enable-coredns-nodelocaldns]]",
+    "[[scale-dns-pod-replicas]]"
+  ]
+}

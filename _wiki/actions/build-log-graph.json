@@ -1,0 +1,34 @@
+{
+  "title": "Build Log Graph",
+  "type": "action",
+  "description": "Constructs a log hierarchical tree (graph) from a local log file using indent prefix level sorting and stack push/pop traversal.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-06-29",
+  "updated": "2026-06-30",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/build_log_graph.py --log-file=${log_file} --format=${format}",
+  "summary_fields": [
+    "raw_lines_count",
+    "combined_messages_count",
+    "compression_ratio",
+    "output_file"
+  ],
+  "parameters": {
+    "log_file": {
+      "type": "string",
+      "description": "Local file path to build graph directly from log lines"
+    },
+    "format": {
+      "type": "string",
+      "default": "text",
+      "description": "Output format: 'text' (tree layout) or 'json'"
+    }
+  }
+}

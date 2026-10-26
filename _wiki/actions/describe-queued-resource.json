@@ -1,0 +1,34 @@
+{
+  "title": "Describe Queued Resource",
+  "type": "action",
+  "description": "Describe compute queued resource details in a zone.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-06-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud alpha compute tpus queued-resources describe ${queued_resource_name} --zone=${zone} --project=${project_id}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "queued_resource_name": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    }
+  }
+}

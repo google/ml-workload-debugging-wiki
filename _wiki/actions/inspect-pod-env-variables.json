@@ -1,0 +1,35 @@
+{
+  "title": "Inspect Pod Environment Variables",
+  "type": "action",
+  "description": "Extracts the environment variables of all containers in a specific pod to verify if TPU_ACCELERATOR_TYPE and other required topology variables are present.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "pathways",
+    "analysis"
+  ],
+  "sources": [
+    "symptoms/pathways-expected-topology-mismatch.md"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pod ${pod_name} -n ${namespace} -o jsonpath='{range .spec.containers[*]}{.name}{\"\\n\"}{range .env[*]}{.name}{\"=\"}{.value}{\"\\n\"}{end}{\"\\n\"}{end}'",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "pod_name": {
+      "type": "string",
+      "description": "Name of the target pod to check."
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Namespace of the target pod."
+    }
+  }
+}

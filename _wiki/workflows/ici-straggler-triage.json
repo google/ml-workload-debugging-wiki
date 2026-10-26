@@ -1,0 +1,31 @@
+{
+  "title": "ICI Straggler Triage Workflow",
+  "type": "workflow",
+  "description": "Standard diagnostic workflow for isolating and remediating degraded or abnormally slow ICI links using XLA `ici-sdc-test` delay wave propagation analysis. Directly addresses [[wait-timeout-on-sflag]] and [[slow-step-time]] symptoms.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "timeout",
+    "collective_communication"
+  ],
+  "created": "2026-09-26",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "execution_status",
+    "culprit_chips",
+    "culprit_nodes",
+    "remediation_status"
+  ],
+  "steps": [
+    "[[query-workload-logs]]",
+    "[[query-ici-logs]]",
+    "[[analyze-ici-wave]]",
+    "[[get-node-from-pod-logs]]",
+    "[[isolate-node-via-rr-label]]"
+  ],
+  "step_notes": {}
+}

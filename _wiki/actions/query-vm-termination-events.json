@@ -1,0 +1,54 @@
+{
+  "title": "Query VM Termination Events",
+  "type": "action",
+  "description": "Deterministically queries GCP Audit Logs (Compute Engine System Activity) for host errors, terminations, preemptions, and automated repairs, scoped to a specific workload's nodes. Provides the raw evidence that [[ai-hw-analyzer]] interprets. Scoping is mandatory: an unscoped query over a busy project returns dozens of unrelated preemptions belonging to other workloads, which is the standard route to a false 'this workload was preempted' conclusion.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "hardware_fault",
+    "analysis"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud logging read 'logName:\"cloudaudit.googleapis.com%2Fsystem_event\" AND timestamp>=\"${start}\" AND timestamp<=\"${end}\" AND (protoPayload.methodName:\"compute.instances.hostError\" OR protoPayload.methodName:\"compute.instances.terminate\" OR protoPayload.methodName:\"compute.instances.terminateOnHostMaintenance\" OR protoPayload.methodName:\"compute.instances.preempted\" OR protoPayload.methodName:\"compute.instances.repair.recreateInstance\" OR protoPayload.methodName:\"compute.instances.guestTerminate\") AND (${node_filter})' --project=${project_id} --limit=${limit} --order=ASC --format=json > ${output_file}; python3 -c \"import json,sys; d=json.load(open('${output_file}')); print(json.dumps({'event_count': len(d), 'methods': sorted({e.get('protoPayload',{}).get('methodName','?') for e in d}), 'nodes': sorted({e.get('protoPayload',{}).get('resourceName','?').split('/')[-1] for e in d}), 'output_file': '${output_file}', 'verdict_hint': 'No VM Termination' if not d else 'VM/host events found'}, indent=2))\"",
+  "summary_fields": [
+    "event_count",
+    "methods",
+    "nodes",
+    "output_file",
+    "verdict_hint"
+  ],
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start, UTC YYYY-MM-DDTHH:MM:SSZ. Include lead-in before the first disruption."
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "node_filter": {
+      "type": "string",
+      "description": "REQUIRED scoping clause restricting results to this workload's nodes. Use the `node_filter_clause` field emitted by [[resolve-workload-nodes]] verbatim, e.g. protoPayload.resourceName:\"gke-tpu-node-a\" OR protoPayload.resourceName:\"gke-tpu-node-b\"."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/vm_termination_events.json"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 200
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "title": "Launch Workload Dashboard",
+  "type": "workflow",
+  "description": "Verifies GCP authentication, resolves cluster, project, TPU generation, and backing reservations for a target workload, seeds the dashboard configuration, ensures the local dashboard server is running, generates a direct deep-linked URL focusing on the workload, and verifies that URL resolves and stays responsive during the scan before reporting it.",
+  "internal_only": false,
+  "tags": [
+    "workflow",
+    "monitoring",
+    "triage",
+    "capacity",
+    "auth"
+  ],
+  "created": "2026-09-16",
+  "updated": "2026-09-25",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "summary_fields": [
+    "dashboard_url",
+    "url_status",
+    "url_probes",
+    "cluster_name",
+    "project_id",
+    "generation",
+    "reservation",
+    "status",
+    "server_status",
+    "workload_name"
+  ],
+  "steps": [
+    "[[gcloud-login]]",
+    "[[validate-workload]]",
+    "[[resolve-cluster-metadata]]",
+    "[[configure-and-launch-dashboard]]",
+    "[[verify-dashboard-url]]"
+  ],
+  "step_notes": {
+    "gcloud-login": "Ensures active gcloud CLI authentication and Application Default Credentials (ADC) are valid before API queries.",
+    "validate-workload": "Verifies workload initialization and recovers the underlying cluster name, GCP project ID, and regional location from audit and runtime logs.",
+    "resolve-cluster-metadata": "Inspects the target GKE cluster to resolve TPU generation (e.g. tpu7x, v6e, v5p) and backing GCE reservation before dashboard provisioning.",
+    "configure-and-launch-dashboard": "Provisions the cluster with full metadata in clusters_config.json, launches or verifies the dashboard server daemon, triggers a scan, and returns the deep-linked URL. Returns server_status UNRESPONSIVE (not START_TIMEOUT) when a hung server still holds the port; stop that process before retrying.",
+    "verify-dashboard-url": "Never report a dashboard URL that has not passed this step (url_status VERIFIED, or DEGRADED with a latency caveat). Probes DNS plus the page and /api/health repeatedly while the scan runs, because a server can pass one health check and then freeze once the scan spawns gcloud/kubectl. UNRESOLVABLE: rerun with --hostname localhost. DOWN: nothing listening; relaunch. UNRESPONSIVE: follow url_hint (GRPC_ENABLE_FORK_SUPPORT=0 in _dashboard/server.py, SCAN_CLUSTER_WORKERS), restart the server, and rerun this step."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "title": "Query Pod Exit Codes",
+  "type": "action",
+  "description": "Aggregate exit codes ACROSS ALL PODS of a multi-pod workload via the Python native API (`triage_workloads_api.py`) to identify the non-zero primary failure. Use this for a cross-pod tally; for exit codes in surrounding log context within a single workload, use [[query-exit-codes]] instead.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-23",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/triage_workloads_api.py ${workload_name} --project=${project_id}",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "The name prefix of the workload or jobset."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "The GCP project ID."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    }
+  }
+}

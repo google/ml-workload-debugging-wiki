@@ -1,0 +1,23 @@
+{
+  "title": "Run Cross Layer Analysis",
+  "type": "action",
+  "description": "Coordinate automated log analysis, stack traces, and hardware diagnostics to debug multi-chip hangs cross-layer.",
+  "internal_only": false,
+  "tags": [
+    "hangs",
+    "analysis"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "To perform a cross-layer multi-chip hang analysis:\n1. Collect host-level and TPU runtime metrics alongside `libtpu` program launch/completion logs across all workers.\n2. Inspect XLA compiler HLO dumps and collective communication schedules to identify the in-flight collective or barrier where the stall began.\n3. Cross-reference host Python stack traces, `sflag` timeout directions (`SEND` vs `RECV`), and node hardware/termination events side by side to isolate the root-cause layer and culprit host.",
+  "summary_fields": [
+    "layers_analyzed",
+    "correlated_findings",
+    "root_cause"
+  ],
+  "parameters": {}
+}

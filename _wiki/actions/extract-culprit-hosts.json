@@ -1,0 +1,91 @@
+{
+  "title": "Extract Culprit Hosts",
+  "type": "action",
+  "description": "Extracts the culprit hosts that the runtime names explicitly in its own logs. Pathways: 'lost connection to peer at http://machine/<node>', '<node> exiting'. McJax / MaxText / Megascale multi-slice (signature_family megascale|barrier): the Megascale hang digest 'Potential culprit workers: <worker>:<host>' (megascale_culprits), and JAX coordination-service 'Barrier timed out ... Some timed out task names' / 'Task <t> heartbeat timeout' (non_arriving_tasks, mapped to candidate pod/node; the timeout is the victim, the non-arriving task is the lead). earliest_error_candidates ranks pods by their EARLIEST crash line (never worker 0 or the loudest pod by default). For Pathways it collapses each host death into a single incident, and separates genuine failures from teardown cascade by reporting breadth. Attribution MUST be quoted from these lines rather than inferred from DATA_LOSS device coordinates, which identify where the symptom surfaced and often point at a different slice than the host that died. Node Replacement is decided on distinct PRIMARY incidents, never on raw event count. Reads retry with backoff on Cloud Logging quota (429/RESOURCE_EXHAUSTED) and 503; status is COMPLETE, INCOMPLETE (a query failed or hit --limit; failures listed in query_errors) or NO_DATA (every query failed), and signature_family is 'unknown' rather than 'none' unless status is COMPLETE.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "pathways",
+    "analysis",
+    "hardware_fault"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md",
+    "playbooks/rca-invariants.md",
+    "symptoms/megascale-hang.md"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/extract_culprit_hosts.py --workload_name=${workload_name} --project_id=${project_id} --start=${start} --end=${end} --output_file=${output_file} --limit=${limit} --cluster_seconds=${cluster_seconds} --min_reporting_pods=${min_reporting_pods} --cluster_name=${cluster_name} --namespace=${namespace} --slice_minutes=${slice_minutes}",
+  "summary_fields": [
+    "total_events",
+    "total_incidents",
+    "primary_incidents",
+    "cascade_incidents",
+    "primary_incidents_by_node",
+    "repeat_offenders",
+    "isolate_recommended",
+    "signature_family",
+    "megascale_culprits",
+    "non_arriving_tasks",
+    "earliest_error_candidates",
+    "status",
+    "query_errors"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Workload / jobset name prefix."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/culprit_hosts.json"
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000,
+      "description": "Per-term log read cap; the script warns loudly if a term saturates it, since truncation biases attribution."
+    },
+    "cluster_seconds": {
+      "type": "integer",
+      "default": 120,
+      "description": "Same-node events within this window count as ONE incident (window anchored to the first event, so a drip of retry lines cannot chain)."
+    },
+    "min_reporting_pods": {
+      "type": "integer",
+      "default": 3,
+      "description": "Distinct reporting pods required to classify an incident as primary rather than teardown cascade."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional exact GKE cluster name; narrows every scan via an indexed resource label."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "",
+      "description": "Optional exact Kubernetes namespace; narrows every scan via an indexed resource label."
+    },
+    "slice_minutes": {
+      "type": "integer",
+      "default": 0,
+      "description": "Concurrent slice width in minutes; 0 = auto (360 for windows over one day, else a single query). Truncation is reported per slice."
+    }
+  }
+}

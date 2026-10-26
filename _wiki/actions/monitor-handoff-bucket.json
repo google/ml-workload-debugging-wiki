@@ -1,0 +1,43 @@
+{
+  "title": "Monitor Handoff Bucket",
+  "type": "action",
+  "description": "Monitors target GCS handoff repository for updates across all tracks: customer telemetry or Google verdicts, evidence, and actionable workarounds.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "monitoring"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/watch_handoff_bucket.py --bucket=${bucket} --storage_key=${storage_key}$([ \"${init_baseline}\" = \"true\" ] && echo \" --init_baseline\")",
+  "summary_fields": [
+    "status",
+    "summary",
+    "verdict",
+    "supporting_evidence",
+    "workarounds_and_next_steps",
+    "new_files_count",
+    "modified_files_count",
+    "last_checked_utc"
+  ],
+  "parameters": {
+    "bucket": {
+      "type": "string",
+      "description": "Target GCS bucket name"
+    },
+    "storage_key": {
+      "type": "string",
+      "description": "Incident storage key"
+    },
+    "init_baseline": {
+      "type": "boolean",
+      "default": false,
+      "description": "Force initialize baseline snapshot"
+    }
+  }
+}

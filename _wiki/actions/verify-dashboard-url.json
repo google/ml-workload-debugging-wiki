@@ -1,0 +1,41 @@
+{
+  "title": "Verify Dashboard URL",
+  "type": "action",
+  "description": "Verifies that a generated dashboard URL is actually usable: its hostname resolves, and both the deep-linked page and /api/health on that host return 200 across repeated probes while a scan is running. Fails with an UNRESOLVABLE, DOWN (connection refused), or UNRESPONSIVE (accepts connections but stalls) url_status and a remediation hint instead of handing out a dead link. Succeeds with VERIFIED (every probe passed) or DEGRADED (final round passed, a minority of probes were slow -- report with a latency caveat).",
+  "internal_only": false,
+  "tags": [
+    "monitoring",
+    "triage",
+    "capacity"
+  ],
+  "created": "2026-09-25",
+  "updated": "2026-09-25",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/configure_and_launch_dashboard.py --verify-url '${dashboard_url}' --probes ${probes} --probe-interval ${probe_interval}",
+  "summary_fields": [
+    "status",
+    "dashboard_url",
+    "url_status",
+    "url_probes",
+    "url_error",
+    "url_hint"
+  ],
+  "parameters": {
+    "dashboard_url": {
+      "type": "string",
+      "default": "http://localhost:8080/"
+    },
+    "probes": {
+      "type": "integer",
+      "default": 5
+    },
+    "probe_interval": {
+      "type": "number",
+      "default": 3.0
+    }
+  }
+}

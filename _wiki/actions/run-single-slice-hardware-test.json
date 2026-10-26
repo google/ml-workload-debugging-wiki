@@ -1,0 +1,23 @@
+{
+  "title": "Run Single Slice Hardware Test",
+  "type": "action",
+  "description": "Scale down to a single slice and enable hardware PC counters to test for hardware faults (e.g., stuck sparse core) during startup.",
+  "internal_only": false,
+  "tags": [
+    "hangs",
+    "tpu",
+    "hardware_fault"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "Deploy the workload at a single-slice scale. Enable TPU hardware PC counters and analyze the generated metrics/traces to pinpoint faulty components such as a stuck sparse core.",
+  "summary_fields": [
+    "execution_status",
+    "target_entity"
+  ],
+  "parameters": {}
+}

@@ -1,0 +1,32 @@
+{
+  "title": "Get JobSet Leader Logs",
+  "type": "action",
+  "description": "[TPU McJax Only] Get logs for completion-index=0 pods in a JobSet.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl logs -l jobset.sigs.k8s.io/jobset-name=${jobset_name},jobset.sigs.k8s.io/completion-index=0 -n ${namespace}",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {
+    "jobset_name": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default"
+    }
+  }
+}

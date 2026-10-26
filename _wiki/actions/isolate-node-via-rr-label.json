@@ -1,0 +1,33 @@
+{
+  "title": "Isolate Node via R&R Label",
+  "type": "action",
+  "description": "Label a GKE node to trigger the Report & Replace (R&R) repair process. (Mutating Action)",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl label nodes ${node_name} cloud.google.com/fault-behavior=${fault_behavior}",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "node_name": {
+      "type": "string"
+    },
+    "fault_behavior": {
+      "type": "string",
+      "description": "Fault behavior: SDC, PERFORMANCE, or unspecified",
+      "default": "unspecified"
+    }
+  }
+}

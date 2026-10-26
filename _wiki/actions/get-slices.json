@@ -1,0 +1,24 @@
+{
+  "title": "Get Slices",
+  "type": "action",
+  "description": "List all active TPU slices in the cluster: verifies interconnects are being provisioned for admitted workloads, and monitors slice creation for superslicing/subslicing.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get slice",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {}
+}

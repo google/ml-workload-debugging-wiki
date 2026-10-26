@@ -1,0 +1,68 @@
+{
+  "title": "Query ML Diagnostics Monitored Events",
+  "type": "action",
+  "description": "Queries the Cluster Director / ML Diagnostics Workload Monitoring API (`gcloud alpha mldiagnostics`, `hypercomputecluster.googleapis.com/v1alpha`) on GKE clusters (`>= 1.36.0-gke.4447000`) to cover silent metric-only `PERFORMANCE_DEGRADATION` bottlenecks that do not emit error signatures in Cloud Logging: (1) host cgroup resource saturation (`CPU Utilization Analyzer`, `Host Memory Utilization Analyzer`), (2) accelerator memory saturation (`HBM Capacity Analyzer`, `HBM Bandwidth Analyzer`), (3) silent hardware/fabric throttling (`Thermal Analyzer`, `TPU Throttling Analyzer`, `ICI Link Analyzer`, `ToR NIC Link Analyzer`, `ToR Uplink Congestion`), (4) port-`9431` Prometheus framework stalls (`PyGrain Data Analyzer`, `Async Checkpointing Analyzer`), (5) negative hardware rule-out (`not_detected_analyzers` across all 11 subsystems), and (6) AutoCaptured XProf `.xplane.pb` traces (`profiler_sessions`). Requires the 15-minute duty cycle warmup gate after each `RUNNING` transition (comparing backward-looking `[t-5m, t]` vs. `[t-15m, t]` windows); for crashes, hangs, restarts, preemptions, or `<15m` startup/restore stalls, use Debug Wiki's core Cloud Logging and host/node triage workflows instead.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "gcloud",
+    "gcp",
+    "monitoring",
+    "observability",
+    "triage",
+    "mxla",
+    "hangs"
+  ],
+  "created": "2026-10-07",
+  "updated": "2026-10-07",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/query_mldiagnostics_monitored_events.py --project_id=${project_id} --location=${location} --ml_run_id=${ml_run_id} --workload_id=${workload_id} --event_id=${event_id} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "events_count",
+    "detected_analyzers",
+    "not_detected_analyzers",
+    "matched_symptoms",
+    "recommended_workflows",
+    "affected_instances",
+    "affected_gce_instance_ids",
+    "profiler_sessions",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "timeout_seconds": 120,
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID where the GKE cluster and ML Diagnostics run reside."
+    },
+    "location": {
+      "type": "string",
+      "description": "GCP region or zone where the machineLearningRun is recorded (e.g. us-central1, us-central2)."
+    },
+    "ml_run_id": {
+      "type": "string",
+      "default": "",
+      "description": "Explicit machineLearningRun ID (<job-name>-<timestamp>). When empty, discovers runs matching workload_id via machine-learning-run list."
+    },
+    "workload_id": {
+      "type": "string",
+      "default": "",
+      "description": "Workload or JobSet name prefix used to filter machine-learning-run list when ml_run_id is omitted."
+    },
+    "event_id": {
+      "type": "string",
+      "default": "",
+      "description": "Optional specific monitoredEvent ID to describe. When empty, lists and describes all monitored events for each matching ML run."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/mldiagnostics_monitored_events.json",
+      "description": "Output JSON file path storing the queried monitoredEvents and analyzerReports."
+    }
+  }
+}

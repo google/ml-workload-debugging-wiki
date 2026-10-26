@@ -1,0 +1,56 @@
+{
+  "title": "Analyze HBM Out of Memory (Error 1000)",
+  "type": "action",
+  "description": "Deterministic diagnostic action to analyze XLA TPU HBM OOM allocation tables (Error E1000), disambiguate compile-time static HBM OOM vs runtime fragmentation OOM vs host RAM OOM (exit code 137), break down peak heap consumers (temporaries, arguments, outputs, aliases), and recommend concrete rematerialization, buffer donation, and SPMD sharding mitigations.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "out_of_memory",
+    "training",
+    "analysis"
+  ],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/analyze_hbm_oom.py --workload_name=${workload_name} --project_id=${project_id} --logs_file=${logs_file} --logs=${logs} --start_time=${start_time} --end_time=${end_time} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "oom_category",
+    "peak_hbm_bytes",
+    "dominant_consumer",
+    "root_cause"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Target TPU workload name."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "logs": {
+      "type": "string",
+      "description": "Raw or formatted log entries containing HBM OOM E1000 allocation summary or container OOM logs."
+    },
+    "logs_file": {
+      "type": "string",
+      "description": "Optional file path containing the workload logs (e.g. scratch/queried_logs.txt)."
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 start timestamp for log query fallback."
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Optional ISO-8601 end timestamp for log query fallback."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Optional output JSON path (default 'scratch/hbm_oom_analysis.json')."
+    }
+  }
+}

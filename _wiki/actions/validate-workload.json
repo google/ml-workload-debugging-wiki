@@ -1,0 +1,39 @@
+{
+  "title": "Validate Workload",
+  "type": "action",
+  "description": "Verifies if a workload initialized, failed startup, or was never submitted based on Cloud Logging / Audit Logs within a Start and End timestamp window.",
+  "internal_only": false,
+  "tags": [
+    "analysis",
+    "triage"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-02",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/validate_workload.py --workload ${workload_name} --start ${start_timestamp} --end ${end_timestamp} --project ${project_id}",
+  "summary_fields": [
+    "status",
+    "cluster_name",
+    "location",
+    "project_id",
+    "first_init_timestamp"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "start_timestamp": {
+      "type": "string"
+    },
+    "end_timestamp": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    }
+  }
+}

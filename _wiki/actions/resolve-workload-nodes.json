@@ -1,0 +1,83 @@
+{
+  "title": "Resolve Workload Node Set",
+  "type": "action",
+  "description": "Resolves the COMPLETE set of GKE nodes that hosted a workload's pods by slicing the query window (or in <50ms with 0 Cloud Logging queries when a pre-resolved timestamps/node-mapping JSON is provided), and asserts completeness. A single unsliced log query truncates at its entry cap and yields a partial node set, which silently narrows the scope of downstream hardware analysis. Workload-agnostic (k8s_container logs by pod-name prefix). If no container ever logged (UnexpectedAdmissionError, FailedScheduling, FailedMount, image pull, eviction), falls back to the pods' Kubernetes events: nodes from 'Successfully assigned <ns>/<pod> to <node>' and kubelet source.host, with pre_start_failures counting reasons and samples; node_source says which path ran (container_logs|pod_events|none). Reads retry with backoff on quota (429) and 503; failed queries are listed in query_errors and force INCOMPLETE.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis",
+    "pathways"
+  ],
+  "sources": [
+    "playbooks/workload-disruption-orchestration.md",
+    "playbooks/pod-analyzer-playbook.md"
+  ],
+  "created": "2026-09-02",
+  "updated": "2026-10-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/resolve_workload_nodes.py --workload_name=${workload_name} --project_id=${project_id} --start=${start} --end=${end} --output_file=${output_file} --expected_hosts=${expected_hosts} --slice_minutes=${slice_minutes} --limit=${limit} --cluster_name=${cluster_name} --namespace=${namespace} --timestamps_json=${timestamps_json}",
+  "summary_fields": [
+    "total_nodes",
+    "node_groups",
+    "node_filter_clause",
+    "node_name_filter_clause",
+    "status",
+    "completeness_warnings",
+    "node_source",
+    "pre_start_failures",
+    "query_errors"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Workload / jobset name prefix."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end, UTC YYYY-MM-DDTHH:MM:SSZ."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/workload_nodes.json"
+    },
+    "expected_hosts": {
+      "type": "integer",
+      "default": 0,
+      "description": "Expected TPU host count (slices x hosts_per_slice); 0 disables the completeness assertion."
+    },
+    "slice_minutes": {
+      "type": "integer",
+      "default": 30
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional exact GKE cluster name; narrows every scan via an indexed resource label."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "",
+      "description": "Optional exact Kubernetes namespace; narrows every scan via an indexed resource label."
+    },
+    "timestamps_json": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-resolved timestamps and node-mapping JSON. When present and populated with GKE nodes, extracts the complete node set directly in <50ms with 0 Cloud Logging queries; otherwise automatically falls back to the sliced container-log scan."
+    }
+  }
+}

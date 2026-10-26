@@ -1,0 +1,77 @@
+{
+  "title": "Group Scheduled Events by Run and Node Pool",
+  "type": "action",
+  "description": "Read-only grouping of Kubernetes Scheduled events by (run, node_pool) to identify which runs placed pods on suspect or known-bad node pools.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "kueue",
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py scheduled-events-by-pool --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --start=\"${start}\" --end=\"${end}\" --suspect_pools=\"${suspect_pools}\" --audit_file=\"${audit_file}\" --events_file=\"${events_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "runs_with_scheduled_pods",
+    "pools_by_run",
+    "suspect_pool_hits",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC start timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC end timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "suspect_pools": {
+      "type": "string",
+      "default": "",
+      "description": "Comma-separated suspect node pools (e.g. np-a,np-b)."
+    },
+    "audit_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched audit JSON file."
+    },
+    "events_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched events JSON file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/scheduled_events_by_pool.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

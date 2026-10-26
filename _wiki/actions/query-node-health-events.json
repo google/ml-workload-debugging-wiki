@@ -1,0 +1,58 @@
+{
+  "title": "Query Node Health Events",
+  "type": "action",
+  "description": "Query `k8s_node`-level logs (kubelet, node-problem-detector, TPU device plugin) for the nodes of a workload. Complements [[query-vm-termination-events]], which reads GCE audit logs and therefore sees only interventions made at the GCE layer: a worker killed inside the node -- for example a SIGILL with `si_code=0`, meaning SI_USER, delivered via kill() by another process -- leaves the audit log completely clean. When [[ai-hw-analyzer]] is asked to weigh in-node evidence against a clean audit result, this is the action that produces it. Scoping is mandatory and is done with the `node_name_filter_clause` from [[resolve-workload-nodes]], NOT the `node_filter_clause`: the latter matches `protoPayload.resourceName`, a field that exists only on audit entries. A k8s_node query has neither that field nor a pod_name, so an unscoped run silently returns other workloads' container kills on other clusters and invites a false in-node verdict. For 1,000+ node workloads where `node_name_filter_clause` would exceed Cloud Logging's 20,000-character limit, `pull_and_format_logs.py` automatically compacts >400-node / >18,000-character `resource.labels.node_name` lists into node-pool prefix filters (`resource.labels.node_name:\"<pool>-\"`); you may also scope `node_filter` specifically to candidate culprit nodes from [[extract-culprit-hosts]]. If `original_count` equals `limit` the query saturated and the result is truncated: narrow `filter_extra` and re-run before drawing any negative conclusion from it.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "hardware_fault",
+    "triage"
+  ],
+  "created": "2026-09-03",
+  "updated": "2026-10-16",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/pull_and_format_logs.py --project_id=${project_id} --resource_type=k8s_node --filter_extra=\"${node_filter} AND (${filter_extra})\" --output_file=${output_file} --deduplicate=true --start=${start} --end=${end} --limit=${limit}",
+  "summary_fields": [
+    "original_count",
+    "deduplicated_count",
+    "error_fatal_count",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID."
+    },
+    "node_filter": {
+      "type": "string",
+      "description": "The `node_name_filter_clause` emitted by [[resolve-workload-nodes]] (or a scoped `(resource.labels.node_name=\"<node>\" OR ...)` clause for candidate culprit nodes on 1,000+ node runs; `pull_and_format_logs.py` also auto-compacts >400-node / >18,000-char clauses into node-pool prefixes). REQUIRED. A k8s_node query carries no pod_name label, so without this clause the query is not scoped to the workload at all and returns the whole project's node logs -- other workloads on other clusters."
+    },
+    "start": {
+      "type": "string",
+      "description": "Window start (RFC3339). Required to reach a historical incident: without it gcloud applies its default 1-day freshness and returns nothing."
+    },
+    "end": {
+      "type": "string",
+      "description": "Window end (RFC3339)."
+    },
+    "filter_extra": {
+      "type": "string",
+      "default": "\\\"node-problem-detector\\\" OR \\\"NodeNotReady\\\" OR \\\"KernelDeadlock\\\" OR \\\"OOMKilling\\\" OR \\\"Killing container\\\" OR \\\"Unhealthy\\\" OR \\\"FailedKillPod\\\" OR \\\"SystemOOM\\\" OR \\\"TaskHung\\\" OR \\\"tpu-device-plugin\\\"",
+      "description": "Log filter expression. The default is restricted to problem indicators; broad terms such as \"kubelet\" or \"TPU\" match routine node chatter, saturate the entry cap, and hide the events worth seeing."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/node_health_events.txt",
+      "description": "Output path for the queried logs."
+    },
+    "limit": {
+      "type": "integer",
+      "default": 5000,
+      "description": "Log read limit. The script defaults to 100, which silently truncates a whole-window sweep."
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Job Disruption Timeline",
+  "type": "action",
+  "description": "Identify a clear chronological timeline of disruption events mapping to jobset changes, relying on GKE Metadata parsing and Head Node tracking.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-28",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/fetch_jobset_timeline.py --workload ${workload_name} --start ${start_timestamp} --end ${end_timestamp} --project ${project_id} --output ${output_file} --workers ${max_concurrent_workers}",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_name": {
+      "type": "string"
+    },
+    "start_timestamp": {
+      "type": "string"
+    },
+    "end_timestamp": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "output_file": {
+      "type": "string"
+    },
+    "max_concurrent_workers": {
+      "type": "integer"
+    }
+  }
+}

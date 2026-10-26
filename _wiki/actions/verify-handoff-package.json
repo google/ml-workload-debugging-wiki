@@ -1,0 +1,35 @@
+{
+  "title": "Verify Handoff Package",
+  "type": "action",
+  "description": "Post-publication content check: lists gs://<bucket>/<storage_key>/ and fails (INCOMPLETE) if any required manifest, README or failure table is missing, or any file is 0 bytes, placeholder-only, or invalid JSON. A failed listing is VERIFY_FAILED, never an empty bucket.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "storage",
+    "gcp"
+  ],
+  "created": "2026-10-04",
+  "updated": "2026-10-04",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/handoff/verify_handoff_package.py --findings=${findings}$([ -n \"${bucket}\" ] && echo \" --bucket=${bucket}\")",
+  "summary_fields": [
+    "status",
+    "storage_root",
+    "file_count",
+    "problem_count"
+  ],
+  "parameters": {
+    "findings": {
+      "type": "string",
+      "description": "Path to troubleshoot_findings.json"
+    },
+    "bucket": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GCS bucket override (else identity.bucket or $HANDOFF_BUCKET; no default)"
+    }
+  }
+}

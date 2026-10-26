@@ -1,0 +1,26 @@
+{
+  "title": "Kueue Stuck Termination Recovery",
+  "type": "workflow",
+  "description": "Resolve pods stuck in Terminating state during Node RIP repair transitions by executing the check-pod-status action, checking and referencing Kueue FailureRecoveryPolicy configurations, and annotating pod templates.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "kueue"
+  ],
+  "created": "2026-09-17",
+  "updated": "2026-09-17",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[check-pod-status]]",
+    "[[enable-kueue-failure-recovery]]",
+    "[[annotate-pod-failure-recovery]]"
+  ]
+}

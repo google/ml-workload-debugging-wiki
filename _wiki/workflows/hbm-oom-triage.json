@@ -1,0 +1,31 @@
+{
+  "title": "HBM Out of Memory (Error 1000) Triage Workflow",
+  "type": "workflow",
+  "description": "End-to-end diagnostic workflow for triaging TPU HBM Out of Memory (`RESOURCE_EXHAUSTED: Out of memory in memory space hbm` Error E1000) and disambiguating compile-time static HBM OOM vs runtime HBM fragmentation vs host RAM OOM (exit code 137). Directly addresses [[hbm-oom]] and [[tpu-coordinator-oom]].",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "out_of_memory",
+    "training",
+    "triage"
+  ],
+  "created": "2026-10-09",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "execution_status",
+    "oom_category",
+    "peak_hbm_bytes",
+    "dominant_consumer",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[query-exit-codes]]",
+    "[[query-workload-logs]]",
+    "[[analyze-hbm-oom]]",
+    "[[inspect-hlo-dumps]]"
+  ],
+  "step_notes": {}
+}

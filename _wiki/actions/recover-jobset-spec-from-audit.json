@@ -1,0 +1,68 @@
+{
+  "title": "Recover JobSet Spec from GKE Audit Logs",
+  "type": "action",
+  "description": "Read-only recovery of per-run JobSet pod templates (nodeSelector, NotIn node-pool exclusions, 4x4x4-state pin, queue name, container env) from GKE audit io.k8s.batch.v1.jobs.create request bodies, even after the JobSet was deleted.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "kueue",
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py recover-jobset-spec --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --start=\"${start}\" --end=\"${end}\" --audit_file=\"${audit_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "runs_recovered",
+    "exclusion_counts_by_run",
+    "exclusion_list_drift",
+    "pins_healthy_only",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC start timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC end timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "audit_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched audit JSON file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/recovered_jobset_specs.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

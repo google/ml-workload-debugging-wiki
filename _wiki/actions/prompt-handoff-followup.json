@@ -1,0 +1,57 @@
+{
+  "title": "Prompt Handoff Follow-up Questionnaire",
+  "type": "action",
+  "description": "Interactive questionnaire presented at the conclusion of /troubleshoot, asking the operator whether to initiate a structured diagnostic handoff via /handoff.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "approval"
+  ],
+  "created": "2026-10-01",
+  "updated": "2026-10-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "manual",
+  "instruction": "Prompt the operator with the handoff follow-up questionnaire.",
+  "summary_fields": [
+    "status",
+    "workload_name",
+    "output_file"
+  ],
+  "questionnaire": {
+    "fields": [
+      {
+        "name": "workload_name",
+        "question": "Troubleshooting analysis complete. Would you like to package the findings, failure table, and diagnostic telemetry for follow-up via /handoff?",
+        "input_mode": "select",
+        "options": [
+          "(Recommended) Yes, prepare and hand off diagnostic package via /handoff",
+          "No, conclude troubleshooting session here"
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "workload_name": {
+      "type": "string",
+      "description": "Name of the investigated workload"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP Project ID"
+    },
+    "cluster": {
+      "type": "string",
+      "description": "GKE Cluster name"
+    },
+    "failure_table": {
+      "type": "string",
+      "description": "Generated Master Failure Table content"
+    },
+    "triage_state_file": {
+      "type": "string",
+      "description": "Path to scratch triage JSON state file"
+    }
+  }
+}

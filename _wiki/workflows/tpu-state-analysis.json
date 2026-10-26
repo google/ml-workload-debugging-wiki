@@ -1,0 +1,27 @@
+{
+  "title": "TPU State Analysis Workflow",
+  "type": "workflow",
+  "description": "Analyze Cloud TPU hardware execution state by enabling verbose logging, tailing coordinator logs, and capturing hang events.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-13",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[list-jobset-pods]]",
+    "[[list-unique-started-pods]]",
+    "[[analyze-sflag-timeouts]]",
+    "[[map-physical-id-to-gke-instance]]"
+  ]
+}

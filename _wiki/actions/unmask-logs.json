@@ -1,0 +1,32 @@
+{
+  "title": "Unmask Logs",
+  "type": "action",
+  "description": "Unmasks a masked log file using the generated mappings JSON file.",
+  "internal_only": false,
+  "tags": [
+    "triage",
+    "analysis"
+  ],
+  "created": "2026-07-24",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/unmask_logs.py --input_file=${input_file} --mappings_file=${mappings_file} --output_file=${output_file}",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "input_file": {
+      "type": "string"
+    },
+    "mappings_file": {
+      "type": "string"
+    },
+    "output_file": {
+      "type": "string"
+    }
+  }
+}

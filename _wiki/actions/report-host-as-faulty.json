@@ -1,0 +1,37 @@
+{
+  "title": "Report Host as Faulty",
+  "type": "action",
+  "description": "Report a VM host as faulty to trigger repair. Note: For GKE-managed TPUs, use the GKE R&R label action (isolate-node-via-rr-label) instead. (Mutating Action)",
+  "internal_only": false,
+  "tags": [
+    "hardware_fault"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-12",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "gcloud compute instances report-host-as-faulty ${vm_name} --zone=${zone} --fault-reasons behavior=${fault_behavior},description=\"${description}\" --disruption-schedule=IMMEDIATE",
+  "summary_fields": [
+    "execution_status",
+    "affected_workload",
+    "output_file"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "vm_name": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    },
+    "fault_behavior": {
+      "type": "string",
+      "default": "BEHAVIOR_UNSPECIFIED"
+    },
+    "description": {
+      "type": "string"
+    }
+  }
+}

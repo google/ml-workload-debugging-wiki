@@ -1,0 +1,81 @@
+{
+  "title": "Check Failure Observability and TPU Log Levels",
+  "type": "action",
+  "description": "Read-only check of a workload's framework (PyTorch/torch_xla, JAX, or Pathways), effective TPU_STDERR_LOG_LEVEL and TPU_MIN_LOG_LEVEL (flagging when the default TPU_STDERR_LOG_LEVEL=3 hides LOG(ERROR) Megascale digests in Cloud Logging), coordinator fatal branch (hang digest vs unrecoverable worker error), and whether a known bug's log signature is directly present or only circumstantial.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "pathways",
+    "gke",
+    "mxla",
+    "logging",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py check-failure-observability --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --start=\"${start}\" --end=\"${end}\" --known_bug_signature=\"${known_bug_signature}\" --audit_file=\"${audit_file}\" --logs_file=\"${logs_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "framework",
+    "effective_tpu_stderr_log_level",
+    "megascale_digest_visible",
+    "coordinator_branch",
+    "known_bug_attribution_strength",
+    "recommended_flags",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "start": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC start timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "end": {
+      "type": "string",
+      "default": "",
+      "description": "Optional UTC end timestamp (YYYY-MM-DDTHH:MM:SSZ)."
+    },
+    "known_bug_signature": {
+      "type": "string",
+      "default": "",
+      "description": "Optional log signature of a suspected bug (e.g. 'Error in send for transfer') to verify whether attribution is direct or circumstantial."
+    },
+    "audit_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched audit JSON file."
+    },
+    "logs_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched container logs file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/failure_observability.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

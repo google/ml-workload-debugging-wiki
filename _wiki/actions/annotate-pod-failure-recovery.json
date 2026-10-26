@@ -1,0 +1,43 @@
+{
+  "title": "Annotate Pod Templates for Failure Recovery",
+  "type": "action",
+  "description": "Dynamically injects the version-aware safe-termination annotation into a Kueue workload's pod templates.",
+  "internal_only": false,
+  "tags": [
+    "scheduling",
+    "triage"
+  ],
+  "created": "2026-07-27",
+  "updated": "2026-10-19",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/kueue_recovery_actions.py annotate-pods --workload_name=\"${workload_name}\" --workload_type=\"${workload_type}\" --namespace=\"${namespace}\" --kueue_version=\"${kueue_version}\"",
+  "summary_fields": [
+    "execution_status",
+    "annotation_applied",
+    "patched_objects"
+  ],
+  "requires_approval": true,
+  "parameters": {
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace of the target workload."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Name of the target Kueue workload or JobSet."
+    },
+    "workload_type": {
+      "type": "string",
+      "default": "jobset",
+      "description": "Kubernetes resource type (e.g. jobset, job)."
+    },
+    "kueue_version": {
+      "type": "string",
+      "description": "Installed Kueue version string (e.g. v0.17.0 or v0.15.4)."
+    }
+  }
+}

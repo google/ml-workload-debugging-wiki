@@ -1,0 +1,28 @@
+{
+  "title": "List Pods in JobSet",
+  "type": "action",
+  "description": "List all Pods spawned by the JobSet.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pods -l jobset.sigs.k8s.io/jobset-name=${jobset_name}",
+  "summary_fields": [
+    "status",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "jobset_name": {
+      "type": "string",
+      "description": "The name of the JobSet."
+    }
+  }
+}

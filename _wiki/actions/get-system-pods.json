@@ -1,0 +1,24 @@
+{
+  "title": "Get System Pods",
+  "type": "action",
+  "description": "Get pods in jobset-system and kueue-system namespaces.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get pods -n jobset-system; kubectl get pods -n kueue-system",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {}
+}

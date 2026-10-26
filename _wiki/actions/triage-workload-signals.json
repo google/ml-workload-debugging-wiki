@@ -1,0 +1,38 @@
+{
+  "title": "Triage Workload Signals",
+  "type": "action",
+  "description": "Triage related TPU workloads and output summaries using Python Native google-cloud-logging API script.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "triage"
+  ],
+  "created": "2026-07-20",
+  "updated": "2026-09-03",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/triage_workloads_api.py ${workload_prefix} --project=${project}$(if [ -n '${output_file}' ]; then echo \" --output_file=${output_file}\"; fi)$(if [ '${deduplicate}' = 'true' ]; then echo \" --deduplicate\"; fi)",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "parameters": {
+    "workload_prefix": {
+      "type": "string"
+    },
+    "project": {
+      "type": "string"
+    },
+    "output_file": {
+      "type": "string",
+      "default": ""
+    },
+    "deduplicate": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

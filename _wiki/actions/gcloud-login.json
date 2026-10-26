@@ -1,0 +1,46 @@
+{
+  "title": "GCloud Auth Login",
+  "type": "action",
+  "description": "Authenticates user credentials with Google Cloud CLI and refreshes Application Default Credentials (ADC) to resolve expired or missing tokens.",
+  "internal_only": false,
+  "tags": [
+    "monitoring",
+    "triage",
+    "auth"
+  ],
+  "created": "2026-09-24",
+  "updated": "2026-10-20",
+  "entrypoints": [
+    "troubleshoot",
+    "dashboard"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/gcloud_login.py --check-only=${check_only} --no-browser=${no_browser} --account=${account}",
+  "summary_fields": [
+    "status",
+    "active_account",
+    "gcloud_token_valid",
+    "adc_token_valid"
+  ],
+  "requires_approval": true,
+  "approval_exempt_params": {
+    "check_only": true
+  },
+  "parameters": {
+    "account": {
+      "type": "string",
+      "default": "",
+      "description": "Specific account to authenticate (optional)."
+    },
+    "check_only": {
+      "type": "boolean",
+      "default": false,
+      "description": "Check token validity without triggering login."
+    },
+    "no_browser": {
+      "type": "boolean",
+      "default": true,
+      "description": "Authorize without launching a local browser."
+    }
+  }
+}

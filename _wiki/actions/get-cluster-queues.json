@@ -1,0 +1,24 @@
+{
+  "title": "Get Cluster Queues",
+  "type": "action",
+  "description": "[Good for debugging scheduling] Check cluster queue details.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get cq; kubectl describe cq cluster-queue",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {}
+}

@@ -1,0 +1,26 @@
+{
+  "title": "Verifying Kubernetes Workload Abstractions",
+  "type": "workflow",
+  "description": "Verify the basic health of Kubernetes training resources by checking pod status and listing active JobSet pods.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[verify-jobset-status]]",
+    "[[list-jobset-jobs]]",
+    "[[list-jobset-pods]]"
+  ]
+}

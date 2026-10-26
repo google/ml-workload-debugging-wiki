@@ -1,0 +1,36 @@
+{
+  "title": "Analyze libtpu Program Timing and Outliers",
+  "type": "action",
+  "description": "Analyzes libtpu runtime program enqueue and last_finished_run_id logs to calculate device execution time and host dispatch gaps across TPU workers, identifying outlier stragglers and fingerprint mismatches.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "analysis",
+    "logging",
+    "observability",
+    "metrics"
+  ],
+  "sources": [
+    "playbooks/libtpu-enqueue-timing-analysis.md"
+  ],
+  "created": "2026-09-01",
+  "updated": "2026-09-01",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/analyze_libtpu_timing.py ${log_file}",
+  "summary_fields": [
+    "total_raw_events",
+    "total_workers",
+    "total_cycles",
+    "outlier_workers_count"
+  ],
+  "parameters": {
+    "log_file": {
+      "type": "string",
+      "description": "Path to the raw log file containing libtpu enqueue and completion lines"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "title": "Inspect HLO Dumps",
+  "type": "action",
+  "description": "Inspect HLO/LLO compilation dumps (local directory, GCS URI, or pod path), extract collective channel IDs and custom calls, and detect cross-worker HLO module or fingerprint mismatches.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training",
+    "analysis"
+  ],
+  "created": "2026-06-16",
+  "updated": "2026-10-09",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/inspect_hlo_dumps.py --dump_source=${dump_source} --workload_name=${workload_name} --xplane_path=${xplane_path} --bucket_location=${bucket_location} --output_file=${output_file}",
+  "summary_fields": [
+    "status",
+    "verdict",
+    "modules_analyzed",
+    "mismatched_modules",
+    "target_entity",
+    "output_file"
+  ],
+  "parameters": {
+    "dump_source": {
+      "type": "string",
+      "description": "Local directory path, gs:// URI, or pod:<namespace>/<pod>:/tmp/xla_dump containing HLO dump files."
+    },
+    "bucket_location": {
+      "type": "string",
+      "description": "Optional GCS bucket location (gs://path) alias for dump_source."
+    },
+    "workload_name": {
+      "type": "string",
+      "description": "Optional target TPU workload name."
+    },
+    "xplane_path": {
+      "type": "string",
+      "description": "Optional path to .xplane.pb file or directory for embedded HloProto module inspection."
+    },
+    "output_file": {
+      "type": "string",
+      "description": "Optional output JSON path (default 'scratch/hlo_dumps_analysis.json')."
+    }
+  }
+}

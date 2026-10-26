@@ -1,0 +1,24 @@
+{
+  "title": "Get Nodes Taints",
+  "type": "action",
+  "description": "List all nodes with their taints.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "training"
+  ],
+  "created": "2026-06-11",
+  "updated": "2026-06-11",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get nodes -o=custom-columns=NodeName:.metadata.name,TaintKey:.spec.taints[*].key,TaintValue:.spec.taints[*].value,TaintEffect:.spec.taints[*].effect",
+  "summary_fields": [
+    "total_found",
+    "deduplicated_count",
+    "error_logs_count",
+    "output_file"
+  ],
+  "parameters": {}
+}

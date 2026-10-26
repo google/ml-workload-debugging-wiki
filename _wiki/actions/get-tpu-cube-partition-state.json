@@ -1,0 +1,27 @@
+{
+  "title": "Get TPU Cube Partition State",
+  "type": "action",
+  "description": "Read-only per-node cube view for TPU7x (Ironwood) on GKE on AI Hypercomputer. Lists every node of the current cluster context with three label columns: `cloud.google.com/gke-nodepool` (one TPU node pool = one 4x4x4 cube = one reservation sub-block of 16 VMs), `cloud.google.com/gke-tpu-partition-4x4x4-state` (the cube's partition state) and `cloud.google.com/report-and-replace-status` (progress of a report-and-replace request), next to the default STATUS column (Ready / NotReady; cordoned nodes show SchedulingDisabled). Group the rows by node pool: a cube is healthy when all 16 nodes are registered, Ready and schedulable and the partition state is HEALTHY or DEGRADED (DEGRADED = running on ICI resiliency after a single OCS failure; still usable). Cluster-wide, not workload-scoped. Taints are not shown; use [[get-nodes-taints]] for those.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "ironwood",
+    "gke",
+    "kubernetes",
+    "triage"
+  ],
+  "created": "2026-09-29",
+  "updated": "2026-09-29",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "kubectl get nodes -L cloud.google.com/gke-nodepool,cloud.google.com/gke-tpu-partition-4x4x4-state,cloud.google.com/report-and-replace-status",
+  "summary_fields": [
+    "execution_status",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "timeout_seconds": 120,
+  "parameters": {}
+}

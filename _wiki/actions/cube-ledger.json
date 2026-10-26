@@ -1,0 +1,87 @@
+{
+  "title": "Compute Per-Run Cube Ledger and Known-Bad Cube Visibility",
+  "type": "action",
+  "description": "Read-only TPU7x cube ledger accounting: total cubes -> broken/tainted -> usable (HEALTHY + DEGRADED, named) -> DEGRADED subtracted if job pins HEALTHY -> job's own excluded pools -> cubes held by other queues -> free cubes for this run vs needed. Also checks whether known-bad pools are visible to the scheduler via cluster taints or only avoided by per-user NotIn lists.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "gke",
+    "kueue",
+    "scheduling",
+    "capacity",
+    "triage"
+  ],
+  "created": "2026-10-06",
+  "updated": "2026-10-06",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/workload_run_forensics.py cube-ledger --workload_prefix=${workload_prefix} --project_id=${project_id} --cluster_name=${cluster_name} --namespace=${namespace} --excluded_pools=\"${excluded_pools}\" --known_bad_pools=\"${known_bad_pools}\" --needed_cubes=${needed_cubes} --pins_healthy_only=${pins_healthy_only} --nodes_file=\"${nodes_file}\" --holders_file=\"${holders_file}\" --output_file=\"${output_file}\"",
+  "summary_fields": [
+    "usable_cubes",
+    "self_excluded_cubes",
+    "held_by_other_queues_cubes",
+    "free_cubes_for_run",
+    "needed_cubes",
+    "formula",
+    "invisible_known_bad_pools",
+    "output_file"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "workload_prefix": {
+      "type": "string",
+      "description": "Workload or JobSet name prefix (e.g. train-8k)."
+    },
+    "project_id": {
+      "type": "string",
+      "description": "GCP project ID."
+    },
+    "cluster_name": {
+      "type": "string",
+      "default": "",
+      "description": "Optional GKE cluster name."
+    },
+    "namespace": {
+      "type": "string",
+      "default": "default",
+      "description": "Kubernetes namespace."
+    },
+    "excluded_pools": {
+      "type": "string",
+      "default": "",
+      "description": "Comma-separated node pools excluded by the run's NotIn affinity."
+    },
+    "known_bad_pools": {
+      "type": "string",
+      "default": "",
+      "description": "Comma-separated known-bad node pools (e.g. np-a,np-b)."
+    },
+    "needed_cubes": {
+      "type": "integer",
+      "default": 128,
+      "description": "Number of 4x4x4 cubes required by the run (e.g. 128 for 8192 chips)."
+    },
+    "pins_healthy_only": {
+      "type": "string",
+      "default": "false",
+      "description": "Set to 'true' if the run pins 4x4x4-state=HEALTHY only."
+    },
+    "nodes_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched nodes JSON file."
+    },
+    "holders_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional path to pre-fetched held-cubes JSON file."
+    },
+    "output_file": {
+      "type": "string",
+      "default": "scratch/cube_ledger.json",
+      "description": "Output JSON path under scratch/."
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "title": "Debugging Megascale Hangs",
+  "type": "workflow",
+  "description": "Workflow for diagnosing Megascale hangs. CRITICAL: You MUST run [[locate-megascale-hang-timestamp]] and [[query-coordinator-logs-around-timestamp]] first to check coordinator hang digests and tail surrounding failure context. When the digest is Unknown or requires worker-level corroboration, run [[diagnose-sflag-hang]] (for TC/SC sflag outlier grouping, tag:pc halts, DCN action stalls, and silent/missing pod detection) alongside [[analyze-libtpu-timing]] (for per-launch_id program enqueue/completion skew and fingerprint mismatch detection). Ignore worker cancellation warnings during coordinator check.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "timeout",
+    "training",
+    "mxla",
+    "collective_communication"
+  ],
+  "created": "2026-06-08",
+  "updated": "2026-10-15",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "summary_fields": [
+    "workflow_stage",
+    "execution_status",
+    "issues_detected",
+    "next_steps_recommended"
+  ],
+  "steps": [
+    "[[enable-tpu-verbose-logging]]",
+    "[[locate-megascale-hang-timestamp]]",
+    "[[query-coordinator-logs-around-timestamp]]",
+    "[[diagnose-sflag-hang]]",
+    "[[analyze-libtpu-timing]]",
+    "[[verify-training-barrier-api-usage]]",
+    "[[identify-outlier-tpu-stack-trace]]",
+    "[[get-node-from-pod-logs]]",
+    "[[configure-megascale-timeout-flags]]",
+    "[[inspect-hlo-dumps]]",
+    "[[mitigate-tpu-hardware-fault]]",
+    "[[configure-orbax-checkpointing]]"
+  ],
+  "step_notes": {}
+}

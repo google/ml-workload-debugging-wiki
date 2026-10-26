@@ -1,0 +1,42 @@
+{
+  "title": "Detect Flapping Machines",
+  "type": "action",
+  "description": "Read-only deterministic analysis that detects flapping TPU machines and mass events in one zone's GCE system-event timeline, grouping outages by physical host via mapping_file (when provided) or by GCE instance ID; keying by instance ID alone can undercount when node-pool and MIG recreates split one machine's history across VM names and instance IDs. Heuristics: outage = hostError or terminateOnHostMaintenance (assumption, not from the source), merged within 15 min; mass event = >= 5 machines with outages within 15 min (reported separately, no per-host strikes); flag at >= 3 outages in 24 h, >= 2 strikes in 14 d (outages >= 2 h apart outside mass events) or >= 3 maintenance windows opened in 24 h, the *_24h counts being the max over any rolling 24 h (assumption, not from the source). Inputs: [[query-gce-system-events-by-zone]] and an optional instance-to-host mapping JSONL. Thresholds are heuristics from past TPU7x repairs, not SLOs.",
+  "internal_only": false,
+  "tags": [
+    "tpu",
+    "ironwood",
+    "hardware_fault",
+    "analysis",
+    "triage"
+  ],
+  "created": "2026-09-29",
+  "updated": "2026-10-21",
+  "entrypoints": [
+    "troubleshoot"
+  ],
+  "execution_mode": "command",
+  "instruction": "python3 tools/scripts/detect_flapping_machines.py --events_file=\"${events_file}\" --mapping_file=\"${mapping_file}\" --limit_used=${limit_used}",
+  "summary_fields": [
+    "flapping_machines",
+    "mass_events",
+    "truncated"
+  ],
+  "requires_approval": false,
+  "parameters": {
+    "events_file": {
+      "type": "string",
+      "description": "Path to the JSON array written by [[query-gce-system-events-by-zone]] (its default output_file is scratch/gce_system_events.json). Query with a start up to 14 d back so the strike window is covered."
+    },
+    "mapping_file": {
+      "type": "string",
+      "default": "",
+      "description": "Optional JSONL produced by an instance-to-host mapping export, possibly several daily runs concatenated (from the day before the oldest sighting, at most ~15 days back). When provided, groups outages by physical host; when empty, falls back to keying by GCE instance ID, which undercounts across VM recreates."
+    },
+    "limit_used": {
+      "type": "integer",
+      "default": 50000,
+      "description": "The limit passed to [[query-gce-system-events-by-zone]] when events_file was written (its default is 50000); used to detect truncation."
+    }
+  }
+}
