@@ -13,6 +13,7 @@ updated: 2026-10-16
 ---
 
 
+
 ## Overview
 
 Pathways is a single-controller [[jax]] backend alternative to traditional
@@ -65,20 +66,20 @@ graph TD
     (`JAX_BACKEND_TARGET=grpc://<proxy-host>:29000`).
 *   **IFRT Proxy Server (`pathways-proxy`) & Pathways Client**: CPU-only gRPC
     container
-    (`us-docker.pkg.dev/cloud-tpu-v2-images/pathways/proxy_server:jax-<version>`)
+    (`us-docker.pkg.dev/cloud-tpu-v2-images/cloud-pathways/proxy_server:jax-<version>`)
     that receives IFRT requests and forwards HLOs to the **Pathways Client** for
     placement with the Resource Manager. **Important**: XLA compiler flags
     (including `--xla_dump_to=gs://<bucket>/<prefix>/` for HLO dumps) must be
     passed to **`pathways-proxy`** (e.g., via `--pathways-proxy-args`).
 *   **Pathways Resource Manager (`pathways-rm`)**: Central CPU control plane
     container
-    (`us-docker.pkg.dev/cloud-tpu-v2-images/pathways/server:jax-<version>` with
-    `--node_type=resource_manager`). Manages accelerator slices
+    (`us-docker.pkg.dev/cloud-tpu-v2-images/cloud-pathways/server:jax-<version>`
+    with `--node_type=resource_manager`). Manages accelerator slices
     (`--instance_count`, `--instance_type=tpu<type>:<topology>`), monitors
     worker health, gang-schedules computations, coordinates suspend-resume and
     elastic slice transitions, and runs the centralized error aggregator.
 *   **Pathways Worker (`pathways-worker` / `worker`)**: Runs on each TPU VM
-    (`us-docker.pkg.dev/cloud-tpu-v2-images/pathways/server:jax-<version>`),
+    (`us-docker.pkg.dev/cloud-tpu-v2-images/cloud-pathways/server:jax-<version>`),
     executes compiled XLA executables from the proxy server, and coordinates
     multislice collectives via
     [[megascale]](`MEGASCALE_NUM_SLICES`, `MEGASCALE_SLICE_ID`, `MEGASCALE_COORDINATOR_ADDRESS`).
