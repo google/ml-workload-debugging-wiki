@@ -110,7 +110,7 @@ JobSet restart:
 
 ## Post-Recovery Elastic `UpdateAffectedComponent` (`load_slices: 1 reincarnate_slices: 2`) & `Checking latest checkpoint` Stall
 
-In elastic replica-resize workloads (`--num_elastic_slices=3`, e.g.,
+In elastic replica-resize workloads (`--num_elastic_instances=3`, e.g.,
 `example-elastic-3x2k` on $3 \times 2,048$ TPU7x chips in the recorded
 incident), a slice lost to a physical host failure
 is forcefully evicted by Kueue (`KueueForcefullyDeleted`,

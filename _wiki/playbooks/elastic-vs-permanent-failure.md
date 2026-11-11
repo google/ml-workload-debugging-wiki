@@ -106,7 +106,7 @@ Classify each event (evidence -> verdict):
 ## Two-Stage GCE `hostError` + Post-Recovery `UpdateAffectedComponent` (`load_slices: 1 reincarnate_slices: 2`) / `Checking latest checkpoint` Stall
 
 In elastic replica-resize workloads (e.g., `example-workload-3x2k` on $3 \times
-2,048$ TPU7x chips with `--num_elastic_slices=3`), a confirmed physical host
+2,048$ TPU7x chips with `--num_elastic_instances=3`), a confirmed physical host
 failure can trigger a **two-stage failure** where infrastructure recovery
 succeeds (`*** 3/3 Pathways Slices Now Ready ***`) but the workload stalls
 silently in the post-recovery software path:
