@@ -1,7 +1,8 @@
+
 # Quickstart — Antigravity
 
 Setup and dispatch for the ML Workload Debugging Wiki under Antigravity. For
-what the diagnosis actually does and how to judge it, read `_wiki/TUTORIAL.md`.
+what the diagnosis actually does and how to judge it, read `README.md`.
 
 ## Setup
 
@@ -81,4 +82,4 @@ Path                                         | What
 `_agents/skills.json`, `_agents/agents.json` | Registration
 `_wiki/actions/`, `_wiki/workflows/`         | Executable procedure
 `_wiki/INDEX.md`                             | Catalogue of everything
-`_wiki/TUTORIAL.md`                          | The diagnostic walkthrough
+`README.md`                                  | Onboarding and command overview

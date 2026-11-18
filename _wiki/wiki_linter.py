@@ -1636,14 +1636,11 @@ _LEAK_RES = tuple((p, re.compile(p)) for p in _LEAK_PATTERNS)
 def check_toplevel_doc_links(
     wiki_dir: str, all_pages: list[str], issues: list[str]
 ) -> None:
-  """Validates [[wiki-links]] in exempt top-level docs such as TUTORIAL.md.
+  """Validates [[wiki-links]] in exempt top-level docs such as README.md.
 
   Those files are excluded from the page walk because they are documentation
   *about* the wiki, not pages in it -- so frontmatter and orphan rules do not
-  apply. The exclusion would otherwise exempt them from link integrity too, and
-  a tutorial is mostly references: it is the document where a dead link does the
-  most damage, because a newcomer cannot tell a stale pointer from their own
-  mistake.
+  apply. The exclusion would otherwise exempt them from link integrity too.
 
   Args:
     wiki_dir: Absolute path to the `_wiki/` directory.
@@ -1659,7 +1656,7 @@ def check_toplevel_doc_links(
         for f in os.listdir(entry_dir):
           if f.endswith(".md"):
             known.add(os.path.splitext(f)[0])
-  for name in ("TUTORIAL.md",):
+  for name in ("README.md",):
     full = os.path.join(wiki_dir, name)
     if not os.path.exists(full):
       continue
@@ -2051,7 +2048,6 @@ def check_and_sort_metadata(wiki_dir: str) -> list[str]:
       "SCHEMA.md",
       "LOG.md",
       "INDEX.md",
-      "TUTORIAL.md",
       "ADVISOR_NOTES.md",
       "USER_LOG.md",
       "requirements.txt",
@@ -2782,7 +2778,6 @@ def check_unknown_metadata_fields(
       "SCHEMA.md",
       "LOG.md",
       "INDEX.md",
-      "TUTORIAL.md",
       "ADVISOR_NOTES.md",
       "USER_LOG.md",
       "requirements.txt",
@@ -2958,8 +2953,7 @@ def check_portability_leakage(
     for rel_path, entry in sorted(file_cache.items()):
       f = os.path.basename(rel_path)
       if (
-          f
-          in [
+          f in [
               "wiki_linter.py",
               "internal_codename_mappings.json",
               "BUILD",
@@ -2990,8 +2984,7 @@ def check_portability_leakage(
     prune_scan_dirs(root, dirs)
     for f in files:
       if (
-          f
-          in [
+          f in [
               "wiki_linter.py",
               "internal_codename_mappings.json",
               "BUILD",
@@ -3869,11 +3862,6 @@ def run_linter() -> None:
       "SCHEMA.md",
       "INDEX.md",
       "LOG.md",
-      # Top-level meta-documentation, like the entries above: describes the
-      # wiki rather than being a page in it. There is no `tutorial` page type
-      # and forcing it under playbooks/ would pollute the diagnostic taxonomy.
-      # Its links are still checked, by check_toplevel_doc_links below.
-      "TUTORIAL.md",
       "wiki_linter.py",
       "requirements.txt",
       # Forward-looking write targets: created by agents at runtime, not
@@ -4238,7 +4226,7 @@ def run_linter() -> None:
         if norm_link in inbound_links:
           inbound_links[norm_link] += 1
 
-  for doc_rel in ("TUTORIAL.md", "README.md"):
+  for doc_rel in ("README.md",):
     doc_full = os.path.join(wiki_dir, doc_rel)
     if os.path.isfile(doc_full):
       try:
@@ -4391,13 +4379,11 @@ def run_linter() -> None:
     except FileNotFoundError:
       pass
     except (OSError, subprocess.SubprocessError, ValueError) as e:
-      issues.append(
-          f"Failed to check tracked scratch files via VCS: {e}"
-      )
+      issues.append(f"Failed to check tracked scratch files via VCS: {e}")
 
   check_portability_leakage(wiki_dir, issues, file_cache=file_cache)
   check_pii_leakage(wiki_dir, issues, file_cache=file_cache)
-  check_dashboard_pii_and_internal_leaks(wiki_dir, warnings)
+  check_dashboard_pii_and_internal_leaks(wiki_dir, issues)
   rotate_log_if_needed(wiki_dir, current_date_str)
   append_lint_entry(wiki_dir, current_date_str, len(issues))
 
